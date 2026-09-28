@@ -1,0 +1,23 @@
+{
+  "name": "zepp-alarm",
+  "version": "1.0.0",
+  "description": "A simple daily alarm for Zepp OS built with ZeppCore.",
+  "main": "app.js",
+  "scripts": {
+    "build": "zeus build"
+  },
+  "keywords": [
+    "zepp",
+    "zepp-os",
+    "amazfit",
+    "alarm"
+  ],
+  "author": "Ruimtewese",
+  "license": "MIT",
+  "dependencies": {
+    "zeppcore": "github:Ruimtewese/ZeppCore"
+  },
+  "devDependencies": {
+    "@zeppos/device-types": "^3.0.0"
+  }
+}

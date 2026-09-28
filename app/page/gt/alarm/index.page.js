@@ -4,12 +4,14 @@ import {
   text,
   pillAligned,
   card,
-  createSystemSounds,
-  getSystemSoundTypes,
-  playSystemSound,
-  stopSystemSound,
   loadObject,
-  exitApp
+  exitApp,
+
+  createAudioPlayer,
+  setAudioSource,
+  setAudioVolume,
+  prepareAudio,
+  stopAudio
 } from "zeppcore";
 
 import {
@@ -23,6 +25,9 @@ import {
 
 const STORAGE_KEY =
   "zepp_alarm";
+
+const SOUND_FILE =
+  "alarm.mp3";
 
 const SNOOZE_MINUTES =
   5;
@@ -88,7 +93,7 @@ Page({
       minute: 0
     },
 
-    sounds:
+    player:
       null
   },
 
@@ -122,9 +127,6 @@ Page({
           )
       };
     }
-
-    this.state.sounds =
-      createSystemSounds();
   },
 
   build() {
@@ -135,7 +137,7 @@ Page({
 
     configureTheme({
       background:
-        COLORS.background,
+        0x000000,
 
       surface:
         COLORS.surface,
@@ -180,7 +182,7 @@ Page({
       w: 390,
       h: 450,
       color:
-        COLORS.background,
+        0x000000,
       radius: 0
     });
   },
@@ -281,45 +283,84 @@ Page({
   },
 
   startAlarmSound() {
-    const sounds =
-      this.state.sounds;
+    const player =
+      createAudioPlayer();
 
-    if (
-      !sounds ||
-      !sounds.getEnabled()
-    ) {
-      return;
-    }
+    this.state.player =
+      player;
 
-    const types =
-      getSystemSoundTypes(
-        sounds
-      );
+    setAudioSource(
+      player,
+      SOUND_FILE
+    );
 
-    if (
-      !types ||
-      types.ALARM ===
-        undefined
-    ) {
-      return;
-    }
+    player.addEventListener(
+      player.event.COMPLETE,
+      () => {
+        if (
+          this.state.player !==
+          player
+        ) {
+          return;
+        }
 
-    playSystemSound(
-      types.ALARM,
-      30,
-      sounds
+        prepareAudio(
+          player,
+          (ready) => {
+            if (
+              ready &&
+              this.state.player ===
+                player
+            ) {
+              setAudioVolume(
+                player,
+                100
+              );
+
+              player.start();
+            }
+          }
+        );
+      }
+    );
+
+    prepareAudio(
+      player,
+      (ready) => {
+        if (
+          !ready ||
+          this.state.player !==
+            player
+        ) {
+          return;
+        }
+
+        setAudioVolume(
+          player,
+          100
+        );
+
+        player.start();
+      }
     );
   },
 
-  snooze() {
-    const sounds =
-      this.state.sounds;
+  stopAlarmSound() {
+    const player =
+      this.state.player;
 
-    if (sounds) {
-      stopSystemSound(
-        sounds
+    this.state.player =
+      null;
+
+    if (player) {
+      stopAudio(
+        player
       );
     }
+  },
+
+  snooze() {
+    this.stopAlarmSound();
 
     const wakeAt =
       Date.now() +
@@ -351,24 +392,11 @@ Page({
   },
 
   cancelAlarm() {
-    if (
-      this.state.sounds
-    ) {
-      stopSystemSound(
-        this.state.sounds
-      );
-    }
-
+    this.stopAlarmSound();
     exitApp();
   },
 
   onDestroy() {
-    if (
-      this.state.sounds
-    ) {
-      stopSystemSound(
-        this.state.sounds
-      );
-    }
+    this.stopAlarmSound();
   }
 });

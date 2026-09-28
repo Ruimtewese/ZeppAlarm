@@ -396,15 +396,20 @@ Page({
     });
 
     this.state.widgets.next =
-      text({
+      pillAligned({
         x: 41,
-        y: 277,
+        y: 274,
         w: 305,
-        h: 27,
-        value: "ALARM OFF",
-        color: COLORS.text,
-        size: 19,
-        alignH: "left"
+        h: 31,
+        text: "ALARM OFF",
+        horizontal: "left",
+        vertical: "center",
+        paddingX: 8,
+        textColor: COLORS.text,
+        textSize: 17,
+        normalColor: COLORS.surface2,
+        pressColor: COLORS.surface2,
+        radius: 15
       });
   },
 
@@ -586,8 +591,7 @@ Page({
     if (
       this.state.widgets.next
     ) {
-      this.state.widgets.next.setProperty(
-        "text",
+      this.state.widgets.next.setText(
         alarm.enabled
           ? formatNextAlarm(
               alarm.hour,

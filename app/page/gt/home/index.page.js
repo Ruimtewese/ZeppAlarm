@@ -451,7 +451,22 @@ function scheduleAlarm(
   return true;
 }
 
-function testAlarmSound() {
+function testAlarmSound(
+  previousPlayer = null
+) {
+  if (previousPlayer) {
+    try {
+      stopAudio(
+        previousPlayer
+      );
+    } catch (error) {
+      console.log(
+        "Previous test sound stop failed: " +
+        error
+      );
+    }
+  }
+
   const player =
     createAudioPlayer();
 
@@ -465,7 +480,9 @@ function testAlarmSound() {
     (ready) => {
       if (!ready) {
         try {
-          stopAudio(player);
+          stopAudio(
+            player
+          );
         } catch (error) {
           console.log(
             "Test sound prepare failed: " +
@@ -484,7 +501,7 @@ function testAlarmSound() {
     }
   );
 
-  return true;
+  return player;
 }
 
 Page({
@@ -499,7 +516,10 @@ Page({
 
     widgets: {
       days: []
-    }
+    },
+
+    testPlayer:
+      null
   },
 
   onInit() {
@@ -893,5 +913,25 @@ Page({
     }
 
     this.refreshDays();
+  },
+
+  onDestroy() {
+    if (
+      this.state.testPlayer
+    ) {
+      try {
+        stopAudio(
+          this.state.testPlayer
+        );
+      } catch (error) {
+        console.log(
+          "Test sound stop failed: " +
+          error
+        );
+      }
+
+      this.state.testPlayer =
+        null;
+    }
   }
 });

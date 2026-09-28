@@ -166,6 +166,7 @@ Page({
     });
 
     this.buildBackground();
+    this.buildPopup();
     this.buildTime();
     this.buildSnooze();
     this.buildCancel();
@@ -185,24 +186,36 @@ Page({
     });
   },
 
+  buildPopup() {
+    card({
+      x: 35,
+      y: 25,
+      w: 350,
+      h: 400,
+      color:
+        COLORS.surface,
+      radius: 38
+    });
+  },
+
   buildTime() {
     text({
-      x: 20,
-      y: 42,
-      w: 350,
+      x: 35,
+      y: 70,
+      w: 320,
       h: 28,
       value:
-        "ALARM",
+        "WAKE UP",
       color:
         COLORS.muted,
-      size: 18
+      size: 16
     });
 
     text({
-      x: 20,
-      y: 91,
-      w: 350,
-      h: 95,
+      x: 35,
+      y: 105,
+      w: 320,
+      h: 88,
       value:
         formatAlarmTime(
           this.state.alarm.hour,
@@ -217,9 +230,9 @@ Page({
   buildSnooze() {
     pillAligned({
       x: 20,
-      y: 214,
-      w: 350,
-      h: 76,
+      y: 220,
+      w: 320,
+      h: 70,
       text:
         "SNOOZE 5 MIN",
       horizontal:
@@ -243,10 +256,10 @@ Page({
 
   buildCancel() {
     pillAligned({
-      x: 20,
-      y: 308,
-      w: 350,
-      h: 76,
+      x: 35,
+      y: 305,
+      w: 320,
+      h: 70,
       text:
         "CANCEL",
       horizontal:

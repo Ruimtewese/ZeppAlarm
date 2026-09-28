@@ -7,10 +7,11 @@ import {
   timePicker,
   loadObject,
   saveObject,
-  createSystemSounds,
-  getSystemSoundTypes,
-  playSystemSound,
-  areSystemSoundsEnabled
+  createAudioPlayer,
+  setAudioSource,
+  setAudioVolume,
+  prepareAudio,
+  stopAudio
 } from "zeppcore";
 
 import {
@@ -35,6 +36,9 @@ import {
 } from "@zos/alarm";
 
 const STORAGE_KEY = "zepp_alarm";
+
+const SOUND_FILE =
+  "alarm.mp3";
 
 const DAYS = [
   {
@@ -447,38 +451,57 @@ function scheduleAlarm(
   return true;
 }
 
-function testAlarmSound() {
-  const sounds =
-    createSystemSounds();
-
-  if (
-    !areSystemSoundsEnabled(
-      sounds
-    )
-  ) {
-    return false;
+function testAlarmSound(
+  previousPlayer = null
+) {
+  if (previousPlayer) {
+    try {
+      stopAudio(
+        previousPlayer
+      );
+    } catch (error) {
+      console.log(
+        "Previous test sound stop failed: " +
+        error
+      );
+    }
   }
 
-  const types =
-    getSystemSoundTypes(
-      sounds
-    );
+  const player =
+    createAudioPlayer();
 
-  if (
-    !types ||
-    types.ALARM ===
-      undefined
-  ) {
-    return false;
-  }
-
-  playSystemSound(
-    types.ALARM,
-    2,
-    sounds
+  setAudioSource(
+    player,
+    SOUND_FILE
   );
 
-  return true;
+  prepareAudio(
+    player,
+    (ready) => {
+      if (!ready) {
+        try {
+          stopAudio(
+            player
+          );
+        } catch (error) {
+          console.log(
+            "Test sound prepare failed: " +
+            error
+          );
+        }
+        return;
+      }
+
+      setAudioVolume(
+        player,
+        100
+      );
+
+      player.start();
+    }
+  );
+
+  return player;
 }
 
 Page({
@@ -493,7 +516,10 @@ Page({
 
     widgets: {
       days: []
-    }
+    },
+
+    testPlayer:
+      null
   },
 
   onInit() {
@@ -887,5 +913,25 @@ Page({
     }
 
     this.refreshDays();
+  },
+
+  onDestroy() {
+    if (
+      this.state.testPlayer
+    ) {
+      try {
+        stopAudio(
+          this.state.testPlayer
+        );
+      } catch (error) {
+        console.log(
+          "Test sound stop failed: " +
+          error
+        );
+      }
+
+      this.state.testPlayer =
+        null;
+    }
   }
 });

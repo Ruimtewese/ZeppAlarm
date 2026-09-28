@@ -7,10 +7,11 @@ import {
   timePicker,
   loadObject,
   saveObject,
-  createSystemSounds,
-  getSystemSoundTypes,
-  playSystemSound,
-  areSystemSoundsEnabled
+  createAudioPlayer,
+  setAudioSource,
+  setAudioVolume,
+  prepareAudio,
+  stopAudio
 } from "zeppcore";
 
 import {
@@ -35,6 +36,9 @@ import {
 } from "@zos/alarm";
 
 const STORAGE_KEY = "zepp_alarm";
+
+const SOUND_FILE =
+  "alarm.mp3";
 
 const DAYS = [
   {
@@ -448,34 +452,36 @@ function scheduleAlarm(
 }
 
 function testAlarmSound() {
-  const sounds =
-    createSystemSounds();
+  const player =
+    createAudioPlayer();
 
-  if (
-    !areSystemSoundsEnabled(
-      sounds
-    )
-  ) {
-    return false;
-  }
+  setAudioSource(
+    player,
+    SOUND_FILE
+  );
 
-  const types =
-    getSystemSoundTypes(
-      sounds
-    );
+  prepareAudio(
+    player,
+    (ready) => {
+      if (!ready) {
+        try {
+          stopAudio(player);
+        } catch (error) {
+          console.log(
+            "Test sound prepare failed: " +
+            error
+          );
+        }
+        return;
+      }
 
-  if (
-    !types ||
-    types.ALARM ===
-      undefined
-  ) {
-    return false;
-  }
+      setAudioVolume(
+        player,
+        100
+      );
 
-  playSystemSound(
-    types.ALARM,
-    2,
-    sounds
+      player.start();
+    }
   );
 
   return true;

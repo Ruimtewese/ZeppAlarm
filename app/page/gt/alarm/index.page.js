@@ -9,7 +9,6 @@ import {
   playSystemSound,
   stopSystemSound,
   loadObject,
-  saveObject,
   exitApp
 } from "zeppcore";
 
@@ -188,7 +187,7 @@ Page({
 
   buildPopup() {
     card({
-      x: 35,
+      x: 20,
       y: 25,
       w: 350,
       h: 400,
@@ -229,7 +228,7 @@ Page({
 
   buildSnooze() {
     pillAligned({
-      x: 20,
+      x: 35,
       y: 220,
       w: 320,
       h: 70,
@@ -341,27 +340,12 @@ Page({
         repeat_type:
           REPEAT_ONCE,
 
-        store: false
+        store: true
       });
 
     if (
       snoozeId
     ) {
-      const saved =
-        loadObject(
-          STORAGE_KEY,
-          {}
-        );
-
-      saveObject(
-        STORAGE_KEY,
-        {
-          ...saved,
-          snoozeAlarmId:
-            snoozeId
-        }
-      );
-
       exitApp();
     }
   },

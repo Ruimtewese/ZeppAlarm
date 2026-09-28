@@ -1,21 +1,27 @@
 {
   "configVersion": "v3",
+
   "app": {
     "appId": 23728,
-    "appName": "Hello World",
+    "appName": "Zepp Alarm",
     "appType": "app",
     "version": {
-      "code": 1,
-      "name": "1.0.1"
+      "code": 2,
+      "name": "1.1.0"
     },
     "icon": "icon.png",
-    "vender": "zepp",
-    "description": "hello world app"
+    "vender": "Ruimtewese",
+    "description": "A simple daily alarm built with ZeppCore."
   },
+
   "permissions": [
     "data:os.device.info",
-    "device:os.local_storage"
+    "device:os.local_storage",
+    "device:os.alarm",
+    "device:os.bg_service",
+    "device:os.notification"
   ],
+
   "runtime": {
     "apiVersion": {
       "compatible": "4.0",
@@ -23,7 +29,9 @@
       "minVersion": "4.0"
     }
   },
+
   "debug": false,
+
   "targets": {
     "gt": {
       "module": {
@@ -31,8 +39,14 @@
           "pages": [
             "page/gt/home/index.page"
           ]
+        },
+        "app-service": {
+          "services": [
+            "app-service/alarm"
+          ]
         }
       },
+
       "platforms": [
         {
           "st": "r"
@@ -41,16 +55,19 @@
           "st": "s"
         }
       ],
-      "designWidth": 480
+
+      "designWidth": 390
     }
   },
+
   "i18n": {
     "en-US": {
-      "appName": "Hello World"
+      "appName": "Zepp Alarm"
     },
     "zh-CN": {
-      "appName": "你好世界"
+      "appName": "Zepp Alarm"
     }
   },
+
   "defaultLanguage": "en-US"
 }

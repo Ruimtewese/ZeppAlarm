@@ -325,23 +325,12 @@ Page({
   buildHeader() {
     text({
       x: 28,
-      y: 18,
+      y: 20,
       w: 334,
       h: 34,
-      value: "ZEPP ALARM",
+      value: "ALARM",
       color: COLORS.text,
-      size: 25,
-      alignH: "left"
-    });
-
-    text({
-      x: 28,
-      y: 51,
-      w: 334,
-      h: 25,
-      value: "Wake up on your time.",
-      color: COLORS.muted,
-      size: 16,
+      size: 27,
       alignH: "left"
     });
   },
@@ -349,117 +338,58 @@ Page({
   buildTimeCard() {
     this.state.widgets.time =
       pillAligned({
-        x: 24,
-        y: 88,
-        w: 342,
-        h: 142,
+        x: 20,
+        y: 68,
+        w: 350,
+        h: 158,
         text: "07:00",
         horizontal: "center",
         vertical: "center",
         textColor: COLORS.text,
-        textSize: 70,
+        textSize: 76,
         normalColor: COLORS.surface,
         pressColor: COLORS.surface2,
-        radius: 38,
+        radius: 42,
         onClick: () => {
           this.openTimePicker();
         }
       });
-
-    text({
-      x: 24,
-      y: 209,
-      w: 342,
-      h: 25,
-      value: "TAP TO CHANGE",
-      color: COLORS.muted,
-      size: 13
-    });
   },
 
   buildNextCard() {
-    outlineCard({
-      x: 24,
-      y: 242,
-      w: 342,
-      h: 70,
-      color: COLORS.border,
-      radius: 24,
-      lineWidth: 2
-    });
-
-    text({
-      x: 41,
-      y: 251,
-      w: 120,
-      h: 18,
-      value: "NEXT ALARM",
-      color: COLORS.muted,
-      size: 12,
-      alignH: "left"
-    });
-
     this.state.widgets.next =
       pillAligned({
-        x: 41,
-        y: 268,
-        w: 305,
-        h: 31,
-        text: "ALARM OFF",
+        x: 20,
+        y: 245,
+        w: 222,
+        h: 54,
+        text: "NEXT • 07:00",
         horizontal: "left",
         vertical: "center",
-        paddingX: 8,
+        paddingX: 18,
         textColor: COLORS.text,
-        textSize: 17,
+        textSize: 18,
         normalColor: COLORS.surface2,
         pressColor: COLORS.surface2,
-        radius: 15
+        radius: 27
       });
-  },
-
-  buildControls() {
-    text({
-      x: 28,
-      y: 323,
-      w: 120,
-      h: 34,
-      value: "Daily alarm",
-      color: COLORS.text,
-      size: 19,
-      alignH: "left"
-    });
 
     this.state.widgets.switch =
       switchControl({
-        x: 237,
-        y: 317,
-        w: 129,
-        h: 52,
+        x: 252,
+        y: 245,
+        w: 118,
+        h: 54,
         value: false,
-
-        onColor:
-          COLORS.mint,
-
-        offColor:
-          COLORS.surface2,
-
-        pressedOnColor:
-          COLORS.mintPressed,
-
-        pressedOffColor:
-          COLORS.border,
-
+        onColor: COLORS.mint,
+        offColor: COLORS.surface2,
+        pressedOnColor: COLORS.mintPressed,
+        pressedOffColor: COLORS.border,
         onText: "ON",
         offText: "OFF",
-
-        textColor:
-          0x091015,
-
-        textSize: 18,
-
-        onChange: (
-          enabled
-        ) => {
+        textColor: 0x091015,
+        textSize: 17,
+        onChange: (enabled) => {
           this.state.alarm.enabled =
             Boolean(enabled);
 
@@ -480,76 +410,34 @@ Page({
           this.refresh();
         }
       });
+  },
 
+  buildControls() {
     divider({
-      x: 28,
-      y: 382,
-      w: 334,
+      x: 20,
+      y: 320,
+      w: 350,
       h: 2,
       color: COLORS.border
     });
 
     this.state.widgets.test =
       pillAligned({
-        x: 28,
-        y: 395,
-        w: 132,
-        h: 30,
+        x: 20,
+        y: 344,
+        w: 350,
+        h: 62,
         text: "TEST SOUND",
         horizontal: "center",
         vertical: "center",
-        textColor:
-          COLORS.peach,
-        textSize: 12,
-        normalColor:
-          COLORS.surface,
-        pressColor:
-          COLORS.surface2,
-        radius: 15,
+        textColor: COLORS.peach,
+        textSize: 17,
+        normalColor: COLORS.surface,
+        pressColor: COLORS.surface2,
+        radius: 31,
         onClick: () => {
-          const played =
-            testAlarmSound();
-
-          if (
-            this.state.widgets.soundStatus
-          ) {
-            this.state.widgets.soundStatus.setText(
-              played
-                ? "PLAYING"
-                : "SOUND OFF"
-            );
-          }
+          testAlarmSound();
         }
-      });
-
-    text({
-      x: 173,
-      y: 393,
-      w: 95,
-      h: 34,
-      value: "Daily",
-      color: COLORS.muted,
-      size: 13,
-      alignH: "right"
-    });
-
-    this.state.widgets.soundStatus =
-      pillAligned({
-        x: 272,
-        y: 395,
-        w: 94,
-        h: 30,
-        text: "READY",
-        horizontal: "center",
-        vertical: "center",
-        textColor:
-          COLORS.mint,
-        textSize: 11,
-        normalColor:
-          COLORS.surface,
-        pressColor:
-          COLORS.surface2,
-        radius: 15
       });
   },
 
@@ -571,20 +459,36 @@ Page({
         hour,
         minute
       }) => {
-        alarm.hour =
+        const nextHour =
           clamp(
             hour,
             0,
             23
           );
 
-        alarm.minute =
+        const nextMinute =
           clamp(
             minute,
             0,
             59
           );
 
+        /*
+         * Update the large time display immediately while
+         * the picker is being scrolled.
+         */
+        alarm.hour =
+          nextHour;
+
+        alarm.minute =
+          nextMinute;
+
+        this.refresh();
+
+        /*
+         * Persist and reschedule only when the general
+         * picker confirms the selection.
+         */
         if (
           eventType === 2
         ) {
@@ -612,16 +516,6 @@ Page({
       this.state.alarm;
 
     if (
-      this.state.widgets.soundStatus
-    ) {
-      this.state.widgets.soundStatus.setText(
-        areSystemSoundsEnabled()
-          ? "READY"
-          : "SOUND OFF"
-      );
-    }
-
-    if (
       this.state.widgets.time
     ) {
       this.state.widgets.time.setText(
@@ -637,7 +531,8 @@ Page({
     ) {
       this.state.widgets.next.setText(
         alarm.enabled
-          ? formatNextAlarm(
+          ? "NEXT • " +
+            formatNextAlarm(
               alarm.hour,
               alarm.minute
             )
@@ -652,5 +547,4 @@ Page({
         alarm.enabled
       );
     }
-  }
-});
+  }});

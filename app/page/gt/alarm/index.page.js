@@ -20,6 +20,11 @@ import {
 } from "@zos/alarm";
 
 import {
+  Vibrator,
+  VIBRATOR_SCENE_TIMER
+} from "@zos/sensor";
+
+import {
   COLORS
 } from "../../../utils/theme.js";
 
@@ -94,6 +99,9 @@ Page({
     },
 
     player:
+      null,
+
+    vibrator:
       null
   },
 
@@ -140,7 +148,7 @@ Page({
         0x000000,
 
       surface:
-        COLORS.surface,
+        0x000000,
 
       surface2:
         COLORS.surface2,
@@ -173,6 +181,7 @@ Page({
     this.buildCancel();
 
     this.startAlarmSound();
+    this.startAlarmVibration();
   },
 
   buildBackground() {
@@ -194,7 +203,7 @@ Page({
       w: 350,
       h: 400,
       color:
-        COLORS.surface,
+        0x000000,
       radius: 38
     });
   },
@@ -282,6 +291,47 @@ Page({
     });
   },
 
+  startAlarmVibration() {
+    const vibrator =
+      this.state.vibrator;
+
+    if (!vibrator) {
+      return;
+    }
+
+    try {
+      vibrator.stop();
+      vibrator.setMode({
+        mode:
+          VIBRATOR_SCENE_TIMER
+      });
+      vibrator.start();
+    } catch (error) {
+      console.log(
+        "Alarm vibration failed: " +
+        error
+      );
+    }
+  },
+
+  stopAlarmVibration() {
+    const vibrator =
+      this.state.vibrator;
+
+    if (!vibrator) {
+      return;
+    }
+
+    try {
+      vibrator.stop();
+    } catch (error) {
+      console.log(
+        "Alarm vibration stop failed: " +
+        error
+      );
+    }
+  },
+
   startAlarmSound() {
     const player =
       createAudioPlayer();
@@ -361,6 +411,7 @@ Page({
 
   snooze() {
     this.stopAlarmSound();
+    this.stopAlarmVibration();
 
     const wakeAt =
       Date.now() +
@@ -393,10 +444,12 @@ Page({
 
   cancelAlarm() {
     this.stopAlarmSound();
+    this.stopAlarmVibration();
     exitApp();
   },
 
   onDestroy() {
     this.stopAlarmSound();
+    this.stopAlarmVibration();
   }
 });

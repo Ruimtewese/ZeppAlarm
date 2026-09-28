@@ -1,10 +1,11 @@
 App({
   globalData: {},
+
   onCreate(options) {
-    console.log("app on create invoke");
+    console.log("Zepp Alarm app created");
   },
 
   onDestroy(options) {
-    console.log("app on destroy invoke");
-  },
+    console.log("Zepp Alarm app destroyed");
+  }
 });

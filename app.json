@@ -1,0 +1,58 @@
+{
+  "configVersion": "v3",
+  "app": {
+    "appId": 1000001,
+    "appName": "Zepp Alarm",
+    "appType": "app",
+    "version": {
+      "code": 1,
+      "name": "1.0.0"
+    },
+    "vender": "Ruimtewese",
+    "description": "A simple, beautiful daily alarm for Zepp OS."
+  },
+  "permissions": [
+    "device:os.local_storage",
+    "device:os.alarm",
+    "device:os.bg_service",
+    "device:os.notification"
+  ],
+  "runtime": {
+    "apiVersion": {
+      "compatible": "4.2",
+      "target": "4.2",
+      "minVersion": "4.2"
+    }
+  },
+  "targets": {
+    "gt": {
+      "module": {
+        "page": {
+          "pages": [
+            "page/gt/home/index"
+          ]
+        },
+        "app-service": {
+          "services": [
+            "app-service/alarm"
+          ]
+        }
+      },
+      "platforms": [
+        {
+          "st": "r"
+        },
+        {
+          "st": "s"
+        }
+      ],
+      "designWidth": 390
+    }
+  },
+  "i18n": {
+    "en-US": {
+      "appName": "Zepp Alarm"
+    }
+  },
+  "defaultLanguage": "en-US"
+}

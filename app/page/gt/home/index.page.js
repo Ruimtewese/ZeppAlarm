@@ -1,16 +1,12 @@
 import {
   setupPage,
   configureTheme,
-  text,
   pillAligned,
   card,
-  outlineCard,
-  divider,
   switchControl,
   timePicker,
   loadObject,
   saveObject,
-  formatTime,
   createSystemSounds,
   getSystemSoundTypes,
   playSystemSound,
@@ -18,18 +14,77 @@ import {
 } from "zeppcore";
 
 import {
+  prop
+} from "@zos/ui";
+
+import {
   set,
   cancel,
-  REPEAT_DAY
+  REPEAT_WEEK,
+  WEEK_MON,
+  WEEK_TUE,
+  WEEK_WED,
+  WEEK_THU,
+  WEEK_FRI,
+  WEEK_SAT,
+  WEEK_SUN
 } from "@zos/alarm";
 
 const STORAGE_KEY = "zepp_alarm";
+
+const DAYS = [
+  {
+    key: "MON",
+    label: "M",
+    mask: WEEK_MON
+  },
+  {
+    key: "TUE",
+    label: "T",
+    mask: WEEK_TUE
+  },
+  {
+    key: "WED",
+    label: "W",
+    mask: WEEK_WED
+  },
+  {
+    key: "THU",
+    label: "T",
+    mask: WEEK_THU
+  },
+  {
+    key: "FRI",
+    label: "F",
+    mask: WEEK_FRI
+  },
+  {
+    key: "SAT",
+    label: "S",
+    mask: WEEK_SAT
+  },
+  {
+    key: "SUN",
+    label: "S",
+    mask: WEEK_SUN
+  }
+];
 
 const DEFAULT_ALARM = {
   hour: 7,
   minute: 0,
   enabled: false,
-  alarmId: 0
+  alarmId: 0,
+
+  days: [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+  ]
 };
 
 const COLORS = {
@@ -47,143 +102,256 @@ const COLORS = {
   mint: 0xA8E6C1,
   mintPressed: 0x83D3A7,
 
-  lavender: 0xD8C9FF,
   peach: 0xFFD1A6
 };
 
 configureTheme({
-  background: COLORS.background,
-  surface: COLORS.surface,
-  surface2: COLORS.surface2,
-  accent: COLORS.sky,
-  accentPressed: COLORS.skyPressed,
-  text: COLORS.text,
-  textMuted: COLORS.muted,
-  success: COLORS.mint,
-  border: COLORS.border,
+  background:
+    COLORS.background,
+
+  surface:
+    COLORS.surface,
+
+  surface2:
+    COLORS.surface2,
+
+  accent:
+    COLORS.sky,
+
+  accentPressed:
+    COLORS.skyPressed,
+
+  text:
+    COLORS.text,
+
+  textMuted:
+    COLORS.muted,
+
+  success:
+    COLORS.mint,
+
+  border:
+    COLORS.border,
+
   radius: 26
 });
 
-function clamp(value, min, max) {
+function clamp(
+  value,
+  min,
+  max
+) {
   return Math.max(
     min,
-    Math.min(max, Number(value))
+    Math.min(
+      max,
+      Number(value)
+    )
   );
 }
 
-function normalizeAlarm(value) {
-  if (!value || typeof value !== "object") {
+function normalizeAlarm(
+  value
+) {
+  if (
+    !value ||
+    typeof value !==
+      "object"
+  ) {
     return {
-      ...DEFAULT_ALARM
+      ...DEFAULT_ALARM,
+      days: [
+        ...DEFAULT_ALARM.days
+      ]
     };
   }
 
+  const days =
+    Array.isArray(
+      value.days
+    ) &&
+    value.days.length === 7
+      ? value.days.map(
+          Boolean
+        )
+      : [
+          ...DEFAULT_ALARM.days
+        ];
+
   return {
-    hour: clamp(
-      value.hour ?? DEFAULT_ALARM.hour,
-      0,
-      23
-    ),
+    hour:
+      clamp(
+        value.hour ??
+          DEFAULT_ALARM.hour,
+        0,
+        23
+      ),
 
-    minute: clamp(
-      value.minute ?? DEFAULT_ALARM.minute,
-      0,
-      59
-    ),
+    minute:
+      clamp(
+        value.minute ??
+          DEFAULT_ALARM.minute,
+        0,
+        59
+      ),
 
-    enabled: Boolean(
-      value.enabled
-    ),
+    enabled:
+      Boolean(
+        value.enabled
+      ),
 
-    alarmId: Number(
-      value.alarmId ?? 0
-    )
+    alarmId:
+      Number(
+        value.alarmId ??
+          0
+      ),
+
+    days
   };
 }
 
-function makeTime(hour, minute) {
-  const date = new Date();
-
-  date.setHours(
-    hour,
-    minute,
-    0,
-    0
-  );
-
-  return date;
-}
-
-function getNextAlarmTime(hour, minute) {
-  const now = new Date();
-
-  const next = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    hour,
-    minute,
-    0,
-    0
-  );
-
-  if (
-    next.getTime() <=
-    now.getTime()
-  ) {
-    next.setDate(
-      next.getDate() + 1
+function formatAlarmTime(
+  hour,
+  minute
+) {
+  const safeHour =
+    clamp(
+      hour,
+      0,
+      23
     );
-  }
 
-  return next;
-}
+  const safeMinute =
+    clamp(
+      minute,
+      0,
+      59
+    );
 
-function formatAlarmTime(hour, minute) {
-  return formatTime(
-    makeTime(hour, minute),
-    {
-      hour12: false
-    }
-  );
-}
+  const hour12 =
+    safeHour % 12 || 12;
 
-function formatNextAlarm(hour, minute) {
-  const now = new Date();
-  const next = getNextAlarmTime(
-    hour,
-    minute
-  );
-
-  const today =
-    next.getFullYear() ===
-      now.getFullYear() &&
-    next.getMonth() ===
-      now.getMonth() &&
-    next.getDate() ===
-      now.getDate();
+  const period =
+    safeHour >= 12
+      ? "PM"
+      : "AM";
 
   return (
-    today
-      ? "TODAY"
-      : "TOMORROW"
-  ) +
-  " • " +
-  formatAlarmTime(
-    hour,
-    minute
+    String(hour12) +
+    ":" +
+    String(
+      safeMinute
+    ).padStart(
+      2,
+      "0"
+    ) +
+    " " +
+    period
   );
 }
 
-function cancelAlarm(settings) {
+function getWeekMask(
+  days
+) {
+  let mask = 0;
+
+  DAYS.forEach(
+    (day, index) => {
+      if (
+        days[index]
+      ) {
+        mask |=
+          day.mask;
+      }
+    }
+  );
+
+  return mask;
+}
+
+function hasSelectedDay(
+  days
+) {
+  return days.some(
+    Boolean
+  );
+}
+
+function getSelectedDayCount(
+  days
+) {
+  return days.filter(
+    Boolean
+  ).length;
+}
+
+function getNextAlarmTime(
+  hour,
+  minute,
+  days
+) {
+  const now =
+    new Date();
+
+  for (
+    let offset = 0;
+    offset < 8;
+    offset++
+  ) {
+    const candidate =
+      new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() +
+          offset,
+        hour,
+        minute,
+        0,
+        0
+      );
+
+    const index =
+      (
+        candidate.getDay() +
+        6
+      ) % 7;
+
+    if (
+      days[index] &&
+      candidate.getTime() >
+        now.getTime()
+    ) {
+      return candidate;
+    }
+  }
+
+  return new Date(
+    now.getTime() +
+      7 *
+      24 *
+      60 *
+      60 *
+      1000
+  );
+}
+
+function cancelAlarm(
+  settings
+) {
   if (
-    Number(settings.alarmId) > 0
+    Number(
+      settings.alarmId
+    ) > 0
   ) {
     try {
       cancel(
-        Number(settings.alarmId)
+        Number(
+          settings.alarmId
+        )
       );
-    } catch (error) {
+    } catch (
+      error
+    ) {
       console.log(
         "Alarm cancel failed: " +
         error
@@ -191,13 +359,20 @@ function cancelAlarm(settings) {
     }
   }
 
-  settings.alarmId = 0;
+  settings.alarmId =
+    0;
 }
 
-function scheduleAlarm(settings) {
-  cancelAlarm(settings);
+function scheduleAlarm(
+  settings
+) {
+  cancelAlarm(
+    settings
+  );
 
-  if (!settings.enabled) {
+  if (
+    !settings.enabled
+  ) {
     saveObject(
       STORAGE_KEY,
       settings
@@ -206,27 +381,65 @@ function scheduleAlarm(settings) {
     return true;
   }
 
+  if (
+    !hasSelectedDay(
+      settings.days
+    )
+  ) {
+    settings.enabled =
+      false;
+
+    saveObject(
+      STORAGE_KEY,
+      settings
+    );
+
+    return false;
+  }
+
   const next =
     getNextAlarmTime(
       settings.hour,
-      settings.minute
+      settings.minute,
+      settings.days
     );
 
-  const alarmId = set({
-    url: "app-service/alarm",
-    time: Math.floor(
-      next.getTime() / 1000
-    ),
-    repeat_type: REPEAT_DAY,
-    store: true,
-    param: JSON.stringify({
-      hour: settings.hour,
-      minute: settings.minute
-    })
-  });
+  const alarmId =
+    set({
+      url:
+        "app-service/alarm",
 
-  if (!alarmId) {
-    settings.enabled = false;
+      time:
+        Math.floor(
+          next.getTime() /
+            1000
+        ),
+
+      repeat_type:
+        REPEAT_WEEK,
+
+      week_days:
+        getWeekMask(
+          settings.days
+        ),
+
+      store: true,
+
+      param:
+        JSON.stringify({
+          hour:
+            settings.hour,
+
+          minute:
+            settings.minute
+        })
+    });
+
+  if (
+    !alarmId
+  ) {
+    settings.enabled =
+      false;
 
     saveObject(
       STORAGE_KEY,
@@ -251,7 +464,11 @@ function testAlarmSound() {
   const sounds =
     createSystemSounds();
 
-  if (!areSystemSoundsEnabled(sounds)) {
+  if (
+    !areSystemSoundsEnabled(
+      sounds
+    )
+  ) {
     return false;
   }
 
@@ -262,7 +479,8 @@ function testAlarmSound() {
 
   if (
     !types ||
-    types.ALARM === undefined
+    types.ALARM ===
+      undefined
   ) {
     return false;
   }
@@ -279,9 +497,16 @@ function testAlarmSound() {
 Page({
   state: {
     alarm: {
-      ...DEFAULT_ALARM
+      ...DEFAULT_ALARM,
+
+      days: [
+        ...DEFAULT_ALARM.days
+      ]
     },
-    widgets: {}
+
+    widgets: {
+      days: []
+    }
   },
 
   onInit() {
@@ -296,13 +521,13 @@ Page({
 
   build() {
     setupPage({
-      hideStatusBar: true
+      hideStatusBar:
+        true
     });
 
     this.buildBackground();
-    this.buildHeader();
-    this.buildTimeCard();
-    this.buildNextCard();
+    this.buildTime();
+    this.buildDays();
     this.buildControls();
 
     this.refresh();
@@ -314,128 +539,240 @@ Page({
       y: 0,
       w: 390,
       h: 450,
-      color: COLORS.background,
+      color:
+        COLORS.background,
       radius: 0
     });
   },
 
-  buildHeader() {
-    text({
-      x: 28,
-      y: 20,
-      w: 334,
-      h: 34,
-      value: "ALARM",
-      color: COLORS.text,
-      size: 27,
-      alignH: "left"
-    });
-  },
-
-  buildTimeCard() {
+  buildTime() {
     this.state.widgets.time =
       pillAligned({
         x: 20,
-        y: 68,
+        y: 28,
         w: 350,
-        h: 158,
-        text: "07:00",
-        horizontal: "center",
-        vertical: "center",
-        textColor: COLORS.text,
-        textSize: 76,
-        normalColor: COLORS.surface,
-        pressColor: COLORS.surface2,
-        radius: 42,
+        h: 174,
+
+        text:
+          "7:00 AM",
+
+        horizontal:
+          "center",
+
+        vertical:
+          "center",
+
+        textColor:
+          COLORS.text,
+
+        textSize:
+          68,
+
+        normalColor:
+          COLORS.surface,
+
+        pressColor:
+          COLORS.surface2,
+
+        radius:
+          45,
+
         onClick: () => {
           this.openTimePicker();
         }
       });
   },
 
-  buildNextCard() {
-    this.state.widgets.next =
-      pillAligned({
-        x: 20,
-        y: 245,
-        w: 222,
-        h: 54,
-        text: "NEXT • 07:00",
-        horizontal: "left",
-        vertical: "center",
-        paddingX: 18,
-        textColor: COLORS.text,
-        textSize: 18,
-        normalColor: COLORS.surface2,
-        pressColor: COLORS.surface2,
-        radius: 27
-      });
+  buildDays() {
+    const size = 44;
+    const gap = 6;
+    const startX = 20;
+    const y = 220;
 
-    this.state.widgets.switch =
-      switchControl({
-        x: 252,
-        y: 245,
-        w: 118,
-        h: 54,
-        value: false,
-        onColor: COLORS.mint,
-        offColor: COLORS.surface2,
-        pressedOnColor: COLORS.mintPressed,
-        pressedOffColor: COLORS.border,
-        onText: "ON",
-        offText: "OFF",
-        textColor: 0x091015,
-        textSize: 17,
-        onChange: (enabled) => {
-          this.state.alarm.enabled =
-            Boolean(enabled);
+    this.state.widgets.days =
+      [];
 
-          const ok =
-            scheduleAlarm(
-              this.state.alarm
-            );
+    DAYS.forEach(
+      (
+        day,
+        index
+      ) => {
+        this.state.widgets.days[
+          index
+        ] =
+          pillAligned({
+            x:
+              startX +
+              index *
+                (size + gap),
 
-          if (!ok) {
-            this.state.alarm.enabled =
-              false;
+            y,
 
-            this.state.widgets.switch.setValue(
-              false
-            );
-          }
+            w: size,
+            h: size,
 
-          this.refresh();
-        }
-      });
+            text:
+              day.label,
+
+            horizontal:
+              "center",
+
+            vertical:
+              "center",
+
+            textColor:
+              COLORS.muted,
+
+            textSize:
+              16,
+
+            normalColor:
+              COLORS.surface2,
+
+            pressColor:
+              COLORS.border,
+
+            radius:
+              22,
+
+            onClick:
+              () => {
+                const alarm =
+                  this.state.alarm;
+
+                if (
+                  alarm.days[
+                    index
+                  ] &&
+                  getSelectedDayCount(
+                    alarm.days
+                  ) === 1
+                ) {
+                  return;
+                }
+
+                alarm.days[
+                  index
+                ] =
+                  !alarm.days[
+                    index
+                  ];
+
+                this.persistAlarm();
+
+                this.refreshDays();
+
+                if (
+                  alarm.enabled
+                ) {
+                  scheduleAlarm(
+                    alarm
+                  );
+                }
+              }
+          });
+      }
+    );
   },
 
   buildControls() {
-    divider({
-      x: 20,
-      y: 320,
-      w: 350,
-      h: 2,
-      color: COLORS.border
-    });
-
-    this.state.widgets.test =
-      pillAligned({
+    this.state.widgets.switch =
+      switchControl({
         x: 20,
-        y: 344,
-        w: 350,
-        h: 62,
-        text: "TEST SOUND",
-        horizontal: "center",
-        vertical: "center",
-        textColor: COLORS.peach,
-        textSize: 17,
-        normalColor: COLORS.surface,
-        pressColor: COLORS.surface2,
-        radius: 31,
-        onClick: () => {
+        y: 288,
+        w: 168,
+        h: 58,
+
+        value: false,
+
+        onColor:
+          COLORS.mint,
+
+        offColor:
+          COLORS.surface2,
+
+        pressedOnColor:
+          COLORS.mintPressed,
+
+        pressedOffColor:
+          COLORS.border,
+
+        onText:
+          "ON",
+
+        offText:
+          "OFF",
+
+        textColor:
+          0x091015,
+
+        textSize:
+          18,
+
+        onChange:
+          (
+            enabled
+          ) => {
+            this.state.alarm.enabled =
+              Boolean(
+                enabled
+              );
+
+            const ok =
+              scheduleAlarm(
+                this.state.alarm
+              );
+
+            if (
+              !ok
+            ) {
+              this.state.alarm.enabled =
+                false;
+
+              this.state.widgets.switch.setValue(
+                false
+              );
+            }
+
+            this.refresh();
+          }
+      });
+
+    pillAligned({
+      x: 202,
+      y: 288,
+      w: 168,
+      h: 58,
+
+      text:
+        "TEST SOUND",
+
+      horizontal:
+        "center",
+
+      vertical:
+        "center",
+
+      textColor:
+        COLORS.peach,
+
+      textSize:
+        15,
+
+      normalColor:
+        COLORS.surface,
+
+      pressColor:
+        COLORS.surface2,
+
+      radius:
+        29,
+
+      onClick:
+        () => {
           testAlarmSound();
         }
-      });
+    });
   },
 
   openTimePicker() {
@@ -443,7 +780,8 @@ Page({
       this.state.alarm;
 
     timePicker({
-      title: "Alarm time",
+      title:
+        "Alarm time",
 
       hour:
         alarm.hour,
@@ -451,61 +789,91 @@ Page({
       minute:
         alarm.minute,
 
-      onChange: ({
-        eventType,
-        hour,
-        minute
-      }) => {
-        const nextHour =
-          clamp(
-            hour,
-            0,
-            23
-          );
-
-        const nextMinute =
-          clamp(
-            minute,
-            0,
-            59
-          );
-
-        /*
-         * Update the large time display immediately while
-         * the picker is being scrolled.
-         */
-        alarm.hour =
-          nextHour;
-
-        alarm.minute =
-          nextMinute;
-
-        this.refresh();
-
-        /*
-         * Persist and reschedule only when the general
-         * picker confirms the selection.
-         */
-        if (
-          eventType === 2
-        ) {
-          if (
-            alarm.enabled
-          ) {
-            scheduleAlarm(
-              alarm
+      onChange:
+        ({
+          eventType,
+          hour,
+          minute
+        }) => {
+          alarm.hour =
+            clamp(
+              hour,
+              0,
+              23
             );
-          } else {
-            saveObject(
-              STORAGE_KEY,
-              alarm
+
+          alarm.minute =
+            clamp(
+              minute,
+              0,
+              59
             );
-          }
 
           this.refresh();
+
+          if (
+            eventType === 2
+          ) {
+            this.persistAlarm();
+
+            if (
+              alarm.enabled
+            ) {
+              scheduleAlarm(
+                alarm
+              );
+            }
+          }
         }
-      }
     });
+  },
+
+  persistAlarm() {
+    saveObject(
+      STORAGE_KEY,
+      this.state.alarm
+    );
+  },
+
+  refreshDays() {
+    if (
+      !this.state.widgets.days
+    ) {
+      return;
+    }
+
+    this.state.widgets.days.forEach(
+      (
+        dayWidget,
+        index
+      ) => {
+        const selected =
+          Boolean(
+            this.state.alarm
+              .days[index]
+          );
+
+        dayWidget.button.setProperty(
+          prop.MORE,
+          {
+            color:
+              selected
+                ? COLORS.sky
+                : COLORS.surface2
+          }
+        );
+
+        dayWidget.text.setProperty(
+          prop.MORE,
+          {
+            color:
+              selected
+                ? 0x081018
+                : COLORS.muted
+          }
+        );
+      }
+    );
   },
 
   refresh() {
@@ -524,23 +892,13 @@ Page({
     }
 
     if (
-      this.state.widgets.next
-    ) {
-      this.state.widgets.next.setText(
-        alarm.enabled
-          ? formatNextAlarm(
-              alarm.hour,
-              alarm.minute
-            )
-          : "OFF"
-      );
-    }
-
-    if (
       this.state.widgets.switch
     ) {
       this.state.widgets.switch.setValue(
         alarm.enabled
       );
     }
-  }});
+
+    this.refreshDays();
+  }
+});

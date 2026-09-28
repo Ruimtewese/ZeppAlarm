@@ -14,7 +14,8 @@ import {
   formatTime,
   createSystemSounds,
   getSystemSoundTypes,
-  playSystemSound
+  playSystemSound,
+  areSystemSoundsEnabled
 } from "zeppcore";
 
 import {
@@ -253,26 +254,29 @@ function testAlarmSound() {
   const sounds =
     createSystemSounds();
 
+  if (!areSystemSoundsEnabled(sounds)) {
+    return false;
+  }
+
   const types =
     getSystemSoundTypes(
       sounds
     );
 
   if (
-    sounds.getEnabled() &&
-    types &&
-    types.ALARM !== undefined
+    !types ||
+    types.ALARM === undefined
   ) {
-    playSystemSound(
-      types.ALARM,
-      2,
-      sounds
-    );
-
-    return true;
+    return false;
   }
 
-  return false;
+  playSystemSound(
+    types.ALARM,
+    2,
+    sounds
+  );
+
+  return true;
 }
 
 Page({
@@ -364,7 +368,7 @@ Page({
 
     text({
       x: 24,
-      y: 201,
+      y: 209,
       w: 342,
       h: 25,
       value: "TAP TO CHANGE",
@@ -376,9 +380,9 @@ Page({
   buildNextCard() {
     outlineCard({
       x: 24,
-      y: 247,
+      y: 242,
       w: 342,
-      h: 71,
+      h: 70,
       color: COLORS.border,
       radius: 24,
       lineWidth: 2
@@ -386,7 +390,7 @@ Page({
 
     text({
       x: 41,
-      y: 256,
+      y: 251,
       w: 120,
       h: 18,
       value: "NEXT ALARM",
@@ -398,7 +402,7 @@ Page({
     this.state.widgets.next =
       pillAligned({
         x: 41,
-        y: 274,
+        y: 268,
         w: 305,
         h: 31,
         text: "ALARM OFF",
@@ -416,7 +420,7 @@ Page({
   buildControls() {
     text({
       x: 28,
-      y: 337,
+      y: 323,
       w: 120,
       h: 34,
       value: "Daily alarm",
@@ -428,7 +432,7 @@ Page({
     this.state.widgets.switch =
       switchControl({
         x: 237,
-        y: 330,
+        y: 317,
         w: 129,
         h: 52,
         value: false,
@@ -479,7 +483,7 @@ Page({
 
     divider({
       x: 28,
-      y: 399,
+      y: 382,
       w: 334,
       h: 2,
       color: COLORS.border
@@ -488,7 +492,7 @@ Page({
     this.state.widgets.test =
       pillAligned({
         x: 28,
-        y: 410,
+        y: 395,
         w: 132,
         h: 30,
         text: "TEST SOUND",
@@ -503,20 +507,50 @@ Page({
           COLORS.surface2,
         radius: 15,
         onClick: () => {
-          testAlarmSound();
+          const played =
+            testAlarmSound();
+
+          if (
+            this.state.widgets.soundStatus
+          ) {
+            this.state.widgets.soundStatus.setText(
+              played
+                ? "PLAYING"
+                : "SOUND OFF"
+            );
+          }
         }
       });
 
     text({
       x: 173,
-      y: 406,
-      w: 193,
-      h: 36,
-      value: "Repeats every day",
+      y: 393,
+      w: 95,
+      h: 34,
+      value: "Daily",
       color: COLORS.muted,
       size: 13,
       alignH: "right"
     });
+
+    this.state.widgets.soundStatus =
+      pillAligned({
+        x: 272,
+        y: 395,
+        w: 94,
+        h: 30,
+        text: "READY",
+        horizontal: "center",
+        vertical: "center",
+        textColor:
+          COLORS.mint,
+        textSize: 11,
+        normalColor:
+          COLORS.surface,
+        pressColor:
+          COLORS.surface2,
+        radius: 15
+      });
   },
 
   openTimePicker() {
@@ -576,6 +610,16 @@ Page({
   refresh() {
     const alarm =
       this.state.alarm;
+
+    if (
+      this.state.widgets.soundStatus
+    ) {
+      this.state.widgets.soundStatus.setText(
+        areSystemSoundsEnabled()
+          ? "READY"
+          : "SOUND OFF"
+      );
+    }
 
     if (
       this.state.widgets.time

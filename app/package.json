@@ -1,17 +1,17 @@
 {
-  "name": "helloworld",
-  "version": "1.0.0",
-  "description": "",
+  "name": "zepp-alarm",
+  "version": "1.1.0",
+  "description": "A simple daily alarm for Zepp OS built with ZeppCore.",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No tests configured\""
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Ruimtewese",
+  "license": "MIT",
   "devDependencies": {
     "@zeppos/device-types": "^3.0.0"
   },
   "dependencies": {
-    "@zeppos/zml": "^0.0.38"
+    "zeppcore": "github:Ruimtewese/ZeppCore"
   }
 }

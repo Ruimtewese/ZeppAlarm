@@ -1,7 +1,6 @@
 import {
   setupPage,
   configureTheme,
-  getTheme,
   text,
   pillAligned,
   card,
@@ -64,8 +63,6 @@ configureTheme({
   border: COLORS.border,
   radius: 26
 });
-
-const theme = getTheme();
 
 function clamp(value, min, max) {
   return Math.max(
@@ -531,12 +528,11 @@ Page({
     ) {
       this.state.widgets.next.setText(
         alarm.enabled
-          ? "NEXT • " +
-            formatNextAlarm(
+          ? formatNextAlarm(
               alarm.hour,
               alarm.minute
             )
-          : "ALARM OFF"
+          : "OFF"
       );
     }
 

@@ -811,24 +811,36 @@ Page({
     this.buildOptionSwitch(
       "sound",
       "SOUND",
-      332
+      322
     );
     this.buildOptionSwitch(
       "vibration",
       "VIBRATION",
-      382
+      372
     );
   },
 
   buildMainSwitch() {
-    const x = 20;
+    const x = 240;
     const y = 270;
-    const w = 350;
-    const h = 56;
-    const knob = 38;
-    const knobY = y + 9;
-    const offX = x + 9;
-    const onX = x + w - knob - 9;
+    const w = 130;
+    const h = 44;
+    const knob = 30;
+    const knobY = y + 7;
+    const offX = x + 7;
+    const onX = x + w - knob - 7;
+
+    text({
+      x: 20,
+      y: y,
+      w: 190,
+      h: h,
+      value: "ALARM",
+      color: COLORS.muted,
+      size: 14,
+      alignH: horizontalAlign("left"),
+      alignV: verticalAlign("center")
+    });
 
     this.state.widgets.alarmSwitchTrack =
       card({
@@ -837,7 +849,7 @@ Page({
         w,
         h,
         color: COLORS.surface2,
-        radius: 28
+        radius: 22
       });
 
     this.state.widgets.alarmSwitchKnob =
@@ -847,16 +859,15 @@ Page({
         w: knob,
         h: knob,
         color: 0x6D7885,
-        radius: 19
+        radius: 15
       });
 
     const toggle = () => {
       this.toggleAlarm();
     };
 
-    this.state.widgets.alarmSwitchTrack.addEventListener(
-      event.CLICK_DOWN,
-      () => this.animateSmallSwitchPress(
+    const press = (pressed) => {
+      this.animateSmallSwitchPress(
         this.state.widgets.alarmSwitchTrack,
         this.state.widgets.alarmSwitchKnob,
         x,
@@ -867,63 +878,32 @@ Page({
         knobY,
         offX,
         onX,
-        true
-      )
+        pressed
+      );
+    };
+
+    this.state.widgets.alarmSwitchTrack.addEventListener(
+      event.CLICK_DOWN,
+      () => press(true)
     );
 
     this.state.widgets.alarmSwitchTrack.addEventListener(
       event.CLICK_UP,
       () => {
-        this.animateSmallSwitchPress(
-          this.state.widgets.alarmSwitchTrack,
-          this.state.widgets.alarmSwitchKnob,
-          x,
-          y,
-          w,
-          h,
-          knob,
-          knobY,
-          offX,
-          onX,
-          false
-        );
+        press(false);
         toggle();
       }
     );
 
     this.state.widgets.alarmSwitchKnob.addEventListener(
       event.CLICK_DOWN,
-      () => this.animateSmallSwitchPress(
-        this.state.widgets.alarmSwitchTrack,
-        this.state.widgets.alarmSwitchKnob,
-        x,
-        y,
-        w,
-        h,
-        knob,
-        knobY,
-        offX,
-        onX,
-        true
-      )
+      () => press(true)
     );
 
     this.state.widgets.alarmSwitchKnob.addEventListener(
       event.CLICK_UP,
       () => {
-        this.animateSmallSwitchPress(
-          this.state.widgets.alarmSwitchTrack,
-          this.state.widgets.alarmSwitchKnob,
-          x,
-          y,
-          w,
-          h,
-          knob,
-          knobY,
-          offX,
-          onX,
-          false
-        );
+        press(false);
         toggle();
       }
     );
@@ -1098,13 +1078,14 @@ Page({
 
     const enabled = this.state.alarm.enabled;
     const x = 20;
+    const x = 240;
     const y = 270;
-    const w = 350;
-    const h = 56;
-    const knobSize = 38;
-    const knobY = 279;
-    const offX = 29;
-    const onX = 323;
+    const w = 130;
+    const h = 44;
+    const knobSize = 30;
+    const knobY = 277;
+    const offX = 247;
+    const onX = 333;
     const targetX = enabled ? onX : offX;
     const currentX = enabled ? offX : onX;
 
@@ -1124,7 +1105,7 @@ Page({
         w: knobSize,
         h: knobSize,
         color: enabled ? 0x081018 : 0x6D7885,
-        radius: 19
+        radius: 15
       }
     );
 
@@ -1157,7 +1138,7 @@ Page({
       {
         color: enabled ? COLORS.blue : COLORS.surface2,
         x: trackX,
-        y: Number(key === "sound" ? 332 : 382),
+        y: Number(key === "sound" ? 322 : 372),
         w: trackW,
         h: 40,
         radius: 20
@@ -1171,7 +1152,7 @@ Page({
       prop.MORE,
       {
         x: animated ? currentX : targetX,
-        y: Number(key === "sound" ? 338 : 388),
+        y: Number(key === "sound" ? 328 : 378),
         w: knobSize,
         h: knobSize,
         color: enabled ? 0x081018 : 0x6D7885,

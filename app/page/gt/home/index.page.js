@@ -1077,7 +1077,6 @@ Page({
     }
 
     const enabled = this.state.alarm.enabled;
-    const x = 20;
     const x = 240;
     const y = 270;
     const w = 130;
@@ -1093,7 +1092,7 @@ Page({
       prop.MORE,
       {
         color: enabled ? COLORS.blue : COLORS.surface2,
-        x, y, w, h, radius: 28
+        x, y, w, h, radius: 22
       }
     );
 

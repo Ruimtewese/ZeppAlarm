@@ -1307,10 +1307,14 @@ Page({
           return;
         }
 
+        const startY = 198;
+        const endY = 180;
+        const delay = 230 + index * 65;
+
         dayWidget.button.setProperty(
           prop.MORE,
           {
-            y: 188,
+            y: startY,
             alpha: 0
           }
         );
@@ -1318,7 +1322,7 @@ Page({
         dayWidget.text.setProperty(
           prop.MORE,
           {
-            y: 188,
+            y: startY,
             alpha: 0
           }
         );
@@ -1326,22 +1330,22 @@ Page({
         animate(
           dayWidget.button,
           {
-            y: [188, 180],
+            y: [startY, endY],
             alpha: [0, 255],
-            duration: 260,
+            duration: 240,
             easing: "easeout",
-            offset: 260 + index * 45
+            offset: delay
           }
         );
 
         animate(
           dayWidget.text,
           {
-            y: [188, 180],
+            y: [startY, endY],
             alpha: [0, 255],
-            duration: 260,
+            duration: 240,
             easing: "easeout",
-            offset: 260 + index * 45
+            offset: delay
           }
         );
       }

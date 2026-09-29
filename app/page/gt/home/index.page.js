@@ -1,6 +1,7 @@
 import {
   setupPage,
   configureTheme,
+  text,
   pillAligned,
   card,
   switchControl,
@@ -101,10 +102,10 @@ configureTheme({
     COLORS.surface2,
 
   accent:
-    COLORS.sky,
+    COLORS.blue,
 
   accentPressed:
-    COLORS.skyPressed,
+    COLORS.bluePressed,
 
   text:
     COLORS.text,
@@ -113,7 +114,7 @@ configureTheme({
     COLORS.muted,
 
   success:
-    COLORS.mint,
+    COLORS.blue,
 
   border:
     COLORS.border,
@@ -498,12 +499,38 @@ Page({
   },
 
   buildTime() {
+    card({
+      x: 16,
+      y: 16,
+      w: 358,
+      h: 208,
+      color:
+        COLORS.surface,
+      radius: 42
+    });
+
+    text({
+      x: 34,
+      y: 36,
+      w: 322,
+      h: 24,
+      value:
+        "ALARM TIME",
+      color:
+        COLORS.muted,
+      size: 14,
+      alignH:
+        "center",
+      alignV:
+        "center"
+    });
+
     this.state.widgets.time =
       pillAligned({
-        x: 20,
-        y: 28,
-        w: 350,
-        h: 174,
+        x: 28,
+        y: 66,
+        w: 334,
+        h: 118,
 
         text:
           "7:00 AM",
@@ -515,19 +542,19 @@ Page({
           "center",
 
         textColor:
-          COLORS.text,
+          COLORS.blue,
 
         textSize:
-          68,
+          64,
 
         normalColor:
           COLORS.surface,
-
+        
         pressColor:
           COLORS.surface2,
 
         radius:
-          45,
+          34,
 
         onClick: () => {
           this.openTimePicker();
@@ -536,10 +563,26 @@ Page({
   },
 
   buildDays() {
+    text({
+      x: 20,
+      y: 238,
+      w: 350,
+      h: 22,
+      value:
+        "REPEAT",
+      color:
+        COLORS.muted,
+      size: 14,
+      alignH:
+        "center",
+      alignV:
+        "center"
+    });
+
     const size = 44;
     const gap = 6;
     const startX = 20;
-    const y = 220;
+    const y = 268;
 
     this.state.widgets.days =
       [];
@@ -576,7 +619,7 @@ Page({
               COLORS.muted,
 
             textSize:
-              16,
+              17,
 
             normalColor:
               COLORS.surface2,
@@ -631,9 +674,9 @@ Page({
     this.state.widgets.switch =
       switchControl({
         x: 20,
-        y: 288,
-        w: 168,
-        h: 58,
+        y: 334,
+        w: 350,
+        h: 72,
 
         value: false,
 
@@ -650,16 +693,19 @@ Page({
           COLORS.border,
 
         onText:
-          "ON",
+          "ALARM ON",
 
         offText:
-          "OFF",
+          "ALARM OFF",
 
         textColor:
-          0x091015,
+          0xF7F8FB,
 
         textSize:
-          18,
+          21,
+
+        radius:
+          36,
 
         onChange:
           (
@@ -774,7 +820,7 @@ Page({
           {
             color:
               selected
-                ? COLORS.sky
+                ? COLORS.blue
                 : COLORS.surface2
           }
         );

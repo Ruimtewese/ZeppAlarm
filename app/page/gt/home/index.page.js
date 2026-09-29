@@ -616,9 +616,9 @@ Page({
     this.state.widgets.statusText =
       text({
         x: 20,
-        y: 388,
+        y: 426,
         w: 350,
-        h: 20,
+        h: 18,
         value: "",
         color: COLORS.muted,
         size: 12,
@@ -1179,14 +1179,16 @@ Page({
       }
     );
 
-    animate(
-      knob,
-      {
-        x: [currentX, targetX],
-        duration: 260,
-        easing: "easeout"
-      }
-    );
+    if (animated) {
+      animate(
+        knob,
+        {
+          x: [currentX, targetX],
+          duration: 260,
+          easing: "easeout"
+        }
+      );
+    }
   },
 
   animateOpen() {
@@ -1330,7 +1332,70 @@ Page({
         );
       }
     );
+
+    const optionAnimations = [
+      {
+        track: this.state.widgets.soundSwitchTrack,
+        knob: this.state.widgets.soundSwitchKnob,
+        y: 332,
+        offset: 1220
+      },
+      {
+        track: this.state.widgets.vibrationSwitchTrack,
+        knob: this.state.widgets.vibrationSwitchKnob,
+        y: 382,
+        offset: 1360
+      }
+    ];
+
+    optionAnimations.forEach((item) => {
+      if (!item.track || !item.knob) {
+        return;
+      }
+
+      item.track.setProperty(prop.MORE, {
+        alpha: 0
+      });
+
+      item.knob.setProperty(prop.MORE, {
+        alpha: 0
+      });
+
+      animateGroup(
+        [item.track, item.knob],
+        {
+          y: [item.y + 12, item.y],
+          alpha: [0, 255],
+          duration: 300,
+          easing: "easeout",
+          offset: item.offset
+        }
+      );
+    });
   },
+
+    [
+      { widget: this.state.widgets.repeatLabel, y: 202, targetY: 190, offset: 450 },
+      { widget: this.state.widgets.repeatSummary, y: 202, targetY: 190, offset: 450 },
+      { widget: this.state.widgets.statusText, y: 426, targetY: 426, offset: 0 }
+    ].forEach((item) => {
+      if (!item.widget) {
+        return;
+      }
+
+      if (item.widget === this.state.widgets.statusText) {
+        return;
+      }
+
+      item.widget.setProperty(prop.MORE, { y: item.y, alpha: 0 });
+      animate(item.widget, {
+        y: [item.y, item.targetY],
+        alpha: [0, 255],
+        duration: 280,
+        easing: "easeout",
+        offset: item.offset
+      });
+    });
 
   openTimePicker() {
     const alarm =

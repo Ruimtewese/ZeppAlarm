@@ -8,11 +8,14 @@ export const COLORS = {
   text: 0xF7F8FB,
   muted: 0x94A2B5,
 
-  sky: 0xA9DFFF,
-  skyPressed: 0x80C7EC,
+  blue: 0x20A0F5,
+  bluePressed: 0x1688D4,
 
-  mint: 0xA8E6C1,
-  mintPressed: 0x83D3A7,
+  sky: 0x20A0F5,
+  skyPressed: 0x1688D4,
 
-  peach: 0xFFD1A6
+  mint: 0x20A0F5,
+  mintPressed: 0x1688D4,
+
+  peach: 0x20A0F5
 };

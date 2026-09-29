@@ -1087,20 +1087,20 @@ Page({
       cardWidget.setProperty(
         prop.MORE,
         {
-          x: 26,
-          y: 22,
-          w: 338,
-          h: 148,
+          x: 27,
+          y: 16,
+          w: 336,
+          h: 62,
           alpha: 0
         }
       );
 
       popIn(
         cardWidget,
-        16,
-        16,
-        358,
-        158,
+        20,
+        12,
+        350,
+        70,
         {
           scale: 0.92,
           duration: groupDuration,
@@ -1115,7 +1115,7 @@ Page({
       time.setProperty(
         prop.MORE,
         {
-          y: 72,
+          y: 42,
           alpha: 0
         }
       );
@@ -1123,7 +1123,7 @@ Page({
       animate(
         time,
         {
-          y: [72, 54],
+          y: [42, 25],
           alpha: [0, 255],
           duration: groupDuration,
           easing: "easeout",

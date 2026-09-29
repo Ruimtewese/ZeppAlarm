@@ -1262,33 +1262,8 @@ Page({
 
     const repeatOffset = controlOffset + 380;
 
-    [
-      this.state.widgets.repeatLabel,
-      this.state.widgets.repeatSummary
-    ].forEach((widget) => {
-      if (!widget) {
-        return;
-      }
 
-      widget.setProperty(
-        prop.MORE,
-        {
-          y: 202,
-          alpha: 0
-        }
-      );
-
-      animate(
-        widget,
-        {
-          y: [202, 190],
-          alpha: [0, 255],
-          duration: 280,
-          easing: "easeout",
-          offset: repeatOffset
-        }
-      );
-    });
+    const repeatOffset = controlOffset + 380;
 
     this.state.widgets.days.forEach(
       (dayWidget, index) => {
@@ -1299,7 +1274,7 @@ Page({
             alpha: [0, 255],
             duration: 380,
             easing: "easeout",
-            offset: repeatOffset + 280 + index * 100
+            offset: repeatOffset + index * 100
           }
         );
       }
@@ -1319,6 +1294,9 @@ Page({
 
       minute:
         alarm.minute,
+
+      font:
+        "fonts/time.ttf",
 
       onChange:
         ({

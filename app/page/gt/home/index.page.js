@@ -596,9 +596,9 @@ Page({
     this.state.widgets.timeCard =
       card({
         x: 20,
-        y: 36,
+        y: 26,
         w: 350,
-        h: 150,
+        h: 140,
         color: COLORS.surface,
         radius: 26
       });
@@ -606,12 +606,12 @@ Page({
     this.state.widgets.timeText =
       text({
         x: 28,
-        y: 83,
+        y: 66,
         w: 334,
-        h: 56,
+        h: 60,
         value: "7:00 AM",
         color: COLORS.blue,
-        size: 52,
+        size: 60,
         font: "fonts/time.ttf",
         alignH: horizontalAlign("center"),
         alignV: verticalAlign("center")

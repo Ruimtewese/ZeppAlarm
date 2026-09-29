@@ -676,7 +676,8 @@ Page({
         value: "7:00 AM",
         color: COLORS.blue,
         size: 64,
-        alignH: horizontalAlign("left"),
+        font: "fonts/time.ttf",
+        alignH: horizontalAlign("center"),
         alignV: verticalAlign("center")
       });
 
@@ -757,7 +758,7 @@ Page({
 
     const size = 40;
     const gap = 7;
-    const startX = 20;
+    const startX = 34;
     const y = 218;
 
     this.state.widgets.days = [];
@@ -1346,10 +1347,24 @@ Page({
         alpha: 0
       });
 
-      animateGroup(
-        [item.track, item.knob],
+      const knobY = item.y +
+        Math.floor((40 - 28) / 2);
+
+      animate(
+        item.track,
         {
           y: [item.y + 12, item.y],
+          alpha: [0, 255],
+          duration: 300,
+          easing: "easeout",
+          offset: item.offset
+        }
+      );
+
+      animate(
+        item.knob,
+        {
+          y: [knobY + 12, knobY],
           alpha: [0, 255],
           duration: 300,
           easing: "easeout",
@@ -1555,7 +1570,11 @@ Page({
             formatAlarmTime(
               alarm.hour,
               alarm.minute
-            )
+            ),
+          color: alarm.enabled
+            ? 0x111820
+            : COLORS.blue,
+          font: "fonts/time.ttf"
         }
       );
     }

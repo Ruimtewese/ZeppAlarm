@@ -671,7 +671,7 @@ Page({
     this.state.widgets.repeatLabel =
       text({
         x: 20,
-        y: 184,
+        y: 176,
         w: 90,
         h: 22,
         value: "REPEAT",
@@ -684,7 +684,7 @@ Page({
     this.state.widgets.repeatSummary =
       text({
         x: 105,
-        y: 184,
+        y: 176,
         w: 265,
         h: 22,
         value: getRepeatSummary(
@@ -699,7 +699,7 @@ Page({
     const size = 40;
     const gap = 7;
     const startX = 34;
-    const y = 212;
+    const y = 204;
 
     this.state.widgets.days = [];
 
@@ -781,18 +781,18 @@ Page({
     this.buildOptionSwitch(
       "sound",
       "SOUND",
-      320
+      312
     );
     this.buildOptionSwitch(
       "vibration",
       "VIBRATION",
-      380
+      372
     );
   },
 
   buildMainSwitch() {
     const x = 276;
-    const y = 265;
+    const y = 257;
     const w = 84;
     const h = 34;
     const knob = 26;
@@ -815,7 +815,7 @@ Page({
     const row =
       card({
         x: 18,
-        y: 258,
+        y: 250,
         w: 354,
         h: 48,
         color: COLORS.surface,
@@ -828,7 +828,7 @@ Page({
     const labelWidget =
       text({
         x: 34,
-        y: 258,
+        y: 250,
         w: 90,
         h: 48,
         value: "ALARM",
@@ -1190,7 +1190,7 @@ Page({
       this.state.alarm.enabled;
 
     const x = 276;
-    const y = 265;
+    const y = 257;
     const w = 84;
     const h = 34;
     const knobSize = 26;
@@ -1300,8 +1300,8 @@ Page({
     const x = 276;
     const rowY =
       key === "sound"
-        ? 320
-        : 380;
+        ? 312
+        : 372;
 
     const y =
       rowY + 8;
@@ -1473,7 +1473,7 @@ Page({
           this.state.widgets.alarmSwitchKnob,
 
         x: 276,
-        y: 265
+        y: 257
       },
       {
         track:
@@ -1483,7 +1483,7 @@ Page({
           this.state.widgets.soundSwitchKnob,
 
         x: 276,
-        y: 328
+        y: 320
       },
       {
         track:

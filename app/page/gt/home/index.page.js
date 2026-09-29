@@ -520,7 +520,6 @@ Page({
     widgets: {
       days: [],
       timeCard: null,
-      timeLabel: null,
       timeText: null,
       repeatLabel: null,
       repeatSummary: null,
@@ -602,19 +601,6 @@ Page({
         h: 158,
         color: COLORS.surface,
         radius: 32
-      });
-
-    this.state.widgets.timeLabel =
-      text({
-        x: 28,
-        y: 32,
-        w: 334,
-        h: 22,
-        value: "ALARM OFF",
-        color: COLORS.muted,
-        size: 14,
-        alignH: horizontalAlign("left"),
-        alignV: verticalAlign("center")
       });
 
     this.state.widgets.timeText =
@@ -1124,29 +1110,6 @@ Page({
       );
     }
 
-    const label = this.state.widgets.timeLabel;
-    if (label) {
-      label.setProperty(
-        prop.MORE,
-        {
-          x: 40,
-          y: 32,
-          alpha: 0
-        }
-      );
-
-      animate(
-        label,
-        {
-          x: [40, 28],
-          alpha: [0, 255],
-          duration: groupDuration,
-          easing: "easeout",
-          offset: groupOffset
-        }
-      );
-    }
-
     const time = this.state.widgets.timeText;
     if (time) {
       time.setProperty(
@@ -1449,16 +1412,6 @@ Page({
       );
     }
 
-    if (this.state.widgets.timeLabel) {
-      this.state.widgets.timeLabel.setProperty(
-        prop.MORE,
-        {
-          color: alarm.enabled
-            ? 0x43505E
-            : COLORS.muted
-        }
-      );
-    }
   }
 
 });

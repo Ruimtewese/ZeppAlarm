@@ -582,7 +582,7 @@ Page({
     this.state.widgets.timeText =
       text({
         x: 28,
-        y: 65,
+        y: 60,
         w: 334,
         h: 66,
         value: formatAlarmTime(

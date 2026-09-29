@@ -536,20 +536,6 @@ Page({
     this.buildDays();
     this.buildControls();
 
-    this.state.widgets.statusText =
-      text({
-        x: 30,
-        y: 428,
-        w: 330,
-        h: 16,
-        value: "",
-        color: COLORS.muted,
-        size: 12,
-        alignH: horizontalAlign("center"),
-        alignV: verticalAlign("center"),
-        alpha: 0
-      });
-
     this.refresh();
     this.animateOpen();
   },
@@ -1315,6 +1301,52 @@ Page({
       );
     }
 
+    this.state.widgets.days.forEach(
+      (dayWidget, index) => {
+        if (!dayWidget) {
+          return;
+        }
+
+        dayWidget.button.setProperty(
+          prop.MORE,
+          {
+            y: 188,
+            alpha: 0
+          }
+        );
+
+        dayWidget.text.setProperty(
+          prop.MORE,
+          {
+            y: 188,
+            alpha: 0
+          }
+        );
+
+        animate(
+          dayWidget.button,
+          {
+            y: [188, 180],
+            alpha: [0, 255],
+            duration: 260,
+            easing: "easeout",
+            offset: 260 + index * 45
+          }
+        );
+
+        animate(
+          dayWidget.text,
+          {
+            y: [188, 180],
+            alpha: [0, 255],
+            duration: 260,
+            easing: "easeout",
+            offset: 260 + index * 45
+          }
+        );
+      }
+    );
+
     const rows = [
       this.state.widgets.alarmRow,
       this.state.widgets.soundRow,
@@ -1638,42 +1670,7 @@ Page({
   },
 
   showStatus(message) {
-    const status =
-      this.state.widgets.statusText;
-
-    if (!status) {
-      return;
-    }
-
-    status.setProperty(
-      prop.MORE,
-      {
-        text: String(message),
-        alpha: 255
-      }
-    );
-
-    if (this.state.statusTimer) {
-      clearTimeout(
-        this.state.statusTimer
-      );
-    }
-
-    this.state.statusTimer =
-      setTimeout(
-        () => {
-          if (status) {
-            animate(
-              status,
-              {
-                alpha: [255, 0],
-                duration: 250,
-                easing: "easeout"
-              }
-            );
-          }
-        },
-        1000
-      );
+    return;
   }
+
 });

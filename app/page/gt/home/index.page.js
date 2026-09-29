@@ -5,7 +5,6 @@ import {
   pillAligned,
   card,
   circle,
-  switchControl,
   timePicker,
   loadObject,
   saveObject,
@@ -275,6 +274,97 @@ function getSelectedDayCount(
   ).length;
 }
 
+function getRepeatSummary(days) {
+  const count = getSelectedDayCount(days);
+
+  if (count === 7) {
+    return "Every day";
+  }
+
+  const weekdays = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false
+  ];
+
+  const weekends = [
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true
+  ];
+
+  if (days.every((value, index) => value === weekdays[index])) {
+    return "Weekdays";
+  }
+
+  if (days.every((value, index) => value === weekends[index])) {
+    return "Weekends";
+  }
+
+  if (count === 1) {
+    const index = days.findIndex(Boolean);
+    return DAYS[index].key.charAt(0) + DAYS[index].key.slice(1).toLowerCase();
+  }
+
+  return count + " days/week";
+}
+
+function getNextOccurrenceLabel(date) {
+  const now = new Date();
+  const todayStart = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    0,
+    0,
+    0,
+    0
+  );
+
+  const occurrenceStart = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    0,
+    0,
+    0,
+    0
+  );
+
+  const dayOffset = Math.round(
+    (occurrenceStart.getTime() - todayStart.getTime()) /
+    (24 * 60 * 60 * 1000)
+  );
+
+  if (dayOffset === 0) {
+    return "Today";
+  }
+
+  if (dayOffset === 1) {
+    return "Tomorrow";
+  }
+
+  const names = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday"
+  ];
+
+  return names[date.getDay()];
+}
+
 function getNextAlarmTime(
   hour,
   minute,
@@ -460,6 +550,9 @@ Page({
       ]
     },
 
+    lastSwitchTap: 0,
+    statusTimer: null,
+
     widgets: {
       days: [],
       timeCard: null,
@@ -467,7 +560,12 @@ Page({
       timeLabel: null,
       timeText: null,
       timeHint: null,
-      repeatLabel: null
+      timeMeta: null,
+      repeatLabel: null,
+      repeatSummary: null,
+      alarmSwitchTrack: null,
+      alarmSwitchKnob: null,
+      statusText: null
     },
   },
 
@@ -492,6 +590,20 @@ Page({
     this.buildDays();
     this.buildControls();
 
+    this.state.widgets.statusText =
+      text({
+        x: 20,
+        y: 388,
+        w: 350,
+        h: 20,
+        value: "",
+        color: COLORS.muted,
+        size: 12,
+        alignH: 1,
+        alignV: 2,
+        alpha: 0
+      });
+
     this.refresh();
     this.animateOpen();
   },
@@ -515,8 +627,7 @@ Page({
         y: 16,
         w: 358,
         h: 174,
-        color:
-          COLORS.blue,
+        color: COLORS.surface,
         radius: 34
       });
 
@@ -525,8 +636,7 @@ Page({
         centerX: 48,
         centerY: 49,
         radius: 6,
-        color:
-          0x081018,
+        color: 0x6D7885,
         alpha: 255
       });
 
@@ -536,10 +646,8 @@ Page({
         y: 35,
         w: 285,
         h: 24,
-        value:
-          "NEXT ALARM",
-        color:
-          0x43505E,
+        value: "ALARM OFF",
+        color: 0x43505E,
         size: 14
       });
 
@@ -549,28 +657,45 @@ Page({
         y: 62,
         w: 334,
         h: 76,
-        value:
-          "7:00 AM",
-        color:
-          0x111820,
+        value: "7:00 AM",
+        color: 0x111820,
         size: 64
+      });
+
+    this.state.widgets.timeMeta =
+      text({
+        x: 28,
+        y: 126,
+        w: 334,
+        h: 22,
+        value: "TURN ON TO SCHEDULE",
+        color: 0x43505E,
+        size: 13,
+        alignH: 0,
+        alignV: 2
       });
 
     this.state.widgets.timeHint =
       text({
-        x: 28,
-        y: 137,
-        w: 334,
-        h: 23,
-        value:
-          "TAP TO CHANGE TIME",
-        color:
-          0x43505E,
-        size: 13
+        x: 250,
+        y: 145,
+        w: 112,
+        h: 20,
+        value: "TAP TO EDIT",
+        color: 0x43505E,
+        size: 12,
+        alignH: 2,
+        alignV: 2
       });
 
-
     this.state.widgets.timeText.addEventListener(
+      event.CLICK_UP,
+      () => {
+        this.openTimePicker();
+      }
+    );
+
+    this.state.widgets.timeMeta.addEventListener(
       event.CLICK_UP,
       () => {
         this.openTimePicker();
@@ -590,13 +715,26 @@ Page({
       text({
         x: 20,
         y: 208,
-        w: 350,
+        w: 90,
         h: 22,
-        value:
-          "REPEAT",
-        color:
-          COLORS.muted,
-        size: 14
+        value: "REPEAT",
+        color: COLORS.muted,
+        size: 14,
+        alignH: 0,
+        alignV: 2
+      });
+
+    this.state.widgets.repeatSummary =
+      text({
+        x: 105,
+        y: 208,
+        w: 265,
+        h: 22,
+        value: "Every day",
+        color: COLORS.muted,
+        size: 14,
+        alignH: 2,
+        alignV: 2
       });
 
     const size = 44;
@@ -604,167 +742,137 @@ Page({
     const startX = 20;
     const y = 236;
 
-    this.state.widgets.days =
-      [];
+    this.state.widgets.days = [];
 
     DAYS.forEach(
-      (
-        day,
-        index
-      ) => {
-        this.state.widgets.days[
-          index
-        ] =
+      (day, index) => {
+        this.state.widgets.days[index] =
           pillAligned({
             x:
               startX +
-              index *
-                (size + gap),
-
+              index * (size + gap),
             y,
-
             w: size,
             h: size,
+            text: day.label,
+            horizontal: "center",
+            vertical: "center",
+            textColor: COLORS.muted,
+            textSize: 17,
+            normalColor: COLORS.surface2,
+            pressColor: COLORS.border,
+            radius: 22,
+            onClick: () => {
+              const alarm = this.state.alarm;
 
-            text:
-              day.label,
-
-            horizontal:
-              "center",
-
-            vertical:
-              "center",
-
-            textColor:
-              COLORS.muted,
-
-            textSize:
-              17,
-
-            normalColor:
-              COLORS.surface2,
-
-            pressColor:
-              COLORS.border,
-
-            radius:
-              22,
-
-            onClick:
-              () => {
-                const alarm =
-                  this.state.alarm;
-
-                if (
-                  alarm.days[
-                    index
-                  ] &&
-                  getSelectedDayCount(
-                    alarm.days
-                  ) === 1
-                ) {
-                  return;
-                }
-
-                alarm.days[
-                  index
-                ] =
-                  !alarm.days[
-                    index
-                  ];
-
-                this.persistAlarm();
-
-                this.refreshDays();
-
-                if (
-                  alarm.enabled
-                ) {
-                  scheduleAlarm(
-                    alarm
-                  );
-                }
+              if (
+                alarm.days[index] &&
+                getSelectedDayCount(alarm.days) === 1
+              ) {
+                return;
               }
+
+              alarm.days[index] = !alarm.days[index];
+
+              this.persistAlarm();
+              this.refreshDays();
+              this.refreshMeta();
+
+              if (alarm.enabled) {
+                scheduleAlarm(alarm);
+                this.showStatus("SCHEDULE UPDATED");
+              } else {
+                this.showStatus("REPEAT UPDATED");
+              }
+            }
           });
       }
     );
   },
 
   buildControls() {
-    this.state.widgets.switch =
-      switchControl({
-        x: 20,
-        y: 304,
-        w: 350,
-        h: 72,
+    const switchY = 304;
+    const trackX = 20;
+    const trackW = 350;
+    const trackH = 72;
+    const knobSize = 48;
+    const knobY = switchY + 12;
+    const offX = trackX + 12;
+    const onX = trackX + trackW - knobSize - 12;
 
-        value: false,
-
-        onColor:
-          COLORS.blue,
-
-        offColor:
-          COLORS.surface2,
-
-        pressedOnColor:
-          COLORS.bluePressed,
-
-        pressedOffColor:
-          COLORS.border,
-
-        onText:
-          "ALARM ON",
-
-        offText:
-          "ALARM OFF",
-
-        textColor:
-          0xF7F8FB,
-
-        textSize:
-          21,
-
-        radius:
-          36,
-
-        onChange:
-          (
-            enabled
-          ) => {
-            this.state.alarm.enabled =
-              Boolean(
-                enabled
-              );
-
-            const ok =
-              scheduleAlarm(
-                this.state.alarm
-              );
-
-            if (
-              !ok
-            ) {
-              this.state.alarm.enabled =
-                false;
-
-              this.state.widgets.switch.setValue(
-                false
-              );
-            }
-
-            this.refresh();
-          }
+    this.state.widgets.alarmSwitchTrack =
+      card({
+        x: trackX,
+        y: switchY,
+        w: trackW,
+        h: trackH,
+        color: COLORS.surface2,
+        radius: 36
       });
 
-    const switchWidget =
-      this.state.widgets.switch.widget;
+    this.state.widgets.alarmSwitchKnob =
+      card({
+        x: offX,
+        y: knobY,
+        w: knobSize,
+        h: knobSize,
+        color: 0x6D7885,
+        radius: 24
+      });
 
-    switchWidget.addEventListener(
+    const toggle = () => {
+      const now = Date.now();
+
+      if (
+        this.state.lastSwitchTap &&
+        now - this.state.lastSwitchTap < 180
+      ) {
+        return;
+      }
+
+      this.state.lastSwitchTap = now;
+      this.toggleAlarm();
+    };
+
+    this.state.widgets.alarmSwitchTrack.addEventListener(
       event.CLICK_DOWN,
+      () => this.animateSwitchPress(true)
+    );
+
+    this.state.widgets.alarmSwitchTrack.addEventListener(
+      event.CLICK_UP,
       () => {
-        animate(
-          switchWidget,
-          {
+        this.animateSwitchPress(false);
+        toggle();
+      }
+    );
+
+    this.state.widgets.alarmSwitchKnob.addEventListener(
+      event.CLICK_DOWN,
+      () => this.animateSwitchPress(true)
+    );
+
+    this.state.widgets.alarmSwitchKnob.addEventListener(
+      event.CLICK_UP,
+      () => {
+        this.animateSwitchPress(false);
+        toggle();
+      }
+    );
+  },
+
+  animateSwitchPress(pressed) {
+    const track = this.state.widgets.alarmSwitchTrack;
+    const knob = this.state.widgets.alarmSwitchKnob;
+
+    if (!track || !knob) {
+      return;
+    }
+
+    animate(
+      track,
+      pressed
+        ? {
             x: [20, 26],
             y: [304, 308],
             w: [350, 338],
@@ -772,16 +880,7 @@ Page({
             duration: 110,
             easing: "easeout"
           }
-        );
-      }
-    );
-
-    switchWidget.addEventListener(
-      event.CLICK_UP,
-      () => {
-        animate(
-          switchWidget,
-          {
+        : {
             x: [26, 20],
             y: [308, 304],
             w: [338, 350],
@@ -789,14 +888,145 @@ Page({
             duration: 180,
             easing: "easeout"
           }
-        );
+    );
+
+    animate(
+      knob,
+      pressed
+        ? {
+            y: [316, 320],
+            w: [48, 44],
+            h: [48, 44],
+            duration: 110,
+            easing: "easeout"
+          }
+        : {
+            y: [320, 316],
+            w: [44, 48],
+            h: [44, 48],
+            duration: 180,
+            easing: "easeout"
+          }
+    );
+  },
+
+  toggleAlarm() {
+    const alarm = this.state.alarm;
+    const nextEnabled = !alarm.enabled;
+
+    alarm.enabled = nextEnabled;
+
+    const ok = scheduleAlarm(alarm);
+
+    if (!ok) {
+      alarm.enabled = false;
+      this.refresh();
+      this.showStatus("COULD NOT SCHEDULE");
+      return;
+    }
+
+    this.refresh();
+    this.animateAlarmState();
+    this.showStatus(
+      alarm.enabled
+        ? "ALARM SCHEDULED"
+        : "ALARM OFF"
+    );
+  },
+
+  animateAlarmState() {
+    const track = this.state.widgets.alarmSwitchTrack;
+    const knob = this.state.widgets.alarmSwitchKnob;
+
+    if (!track || !knob) {
+      return;
+    }
+
+    const enabled = this.state.alarm.enabled;
+    const onX = 320;
+    const offX = 32;
+
+    track.setProperty(
+      prop.MORE,
+      {
+        color: enabled
+          ? COLORS.blue
+          : COLORS.surface2,
+        x: 20,
+        y: 304,
+        w: 350,
+        h: 72,
+        radius: 36
+      }
+    );
+
+    knob.setProperty(
+      prop.MORE,
+      {
+        x: enabled ? onX : offX,
+        y: 316,
+        w: 48,
+        h: 48,
+        color: enabled
+          ? 0x081018
+          : 0x6D7885,
+        radius: 24
+      }
+    );
+
+    animate(
+      knob,
+      {
+        x: [enabled ? offX : onX, enabled ? onX : offX],
+        duration: 360,
+        easing: "easeout"
       }
     );
   },
 
+  animateOpenSwitch() {
+    this.animateAlarmState();
+  },
+
+  showStatus(message) {
+    const status = this.state.widgets.statusText;
+
+    if (!status) {
+      return;
+    }
+
+    status.setProperty(
+      prop.MORE,
+      {
+        text: message,
+        alpha: 255
+      }
+    );
+
+    if (this.state.statusTimer) {
+      clearTimeout(this.state.statusTimer);
+    }
+
+    this.state.statusTimer = setTimeout(() => {
+      fadeIn(
+        status,
+        {
+          duration: 240
+        }
+      );
+      animate(
+        status,
+        {
+          alpha: [255, 0],
+          duration: 240,
+          easing: "linear"
+        }
+      );
+    }, 900);
+  },
+
   animateOpen() {
-    const cardWidget =
-      this.state.widgets.timeCard;
+    const cardWidget = this.state.widgets.timeCard;
 
     if (cardWidget) {
       cardWidget.setProperty(
@@ -824,8 +1054,7 @@ Page({
       );
     }
 
-    const dot =
-      this.state.widgets.timeDot;
+    const dot = this.state.widgets.timeDot;
 
     if (dot) {
       dot.setProperty(
@@ -834,7 +1063,6 @@ Page({
           center_x: 48,
           center_y: 49,
           radius: 6,
-          color: 0x081018,
           alpha: 0
         }
       );
@@ -848,8 +1076,7 @@ Page({
       );
     }
 
-    const label =
-      this.state.widgets.timeLabel;
+    const label = this.state.widgets.timeLabel;
 
     if (label) {
       label.setProperty(
@@ -875,8 +1102,7 @@ Page({
       );
     }
 
-    const timeText =
-      this.state.widgets.timeText;
+    const timeText = this.state.widgets.timeText;
 
     if (timeText) {
       timeText.setProperty(
@@ -902,17 +1128,36 @@ Page({
       );
     }
 
-    const hint =
-      this.state.widgets.timeHint;
+    const meta = this.state.widgets.timeMeta;
+
+    if (meta) {
+      meta.setProperty(
+        prop.MORE,
+        {
+          y: 137,
+          alpha: 0
+        }
+      );
+
+      animate(
+        meta,
+        {
+          y: [137, 126],
+          alpha: [0, 255],
+          duration: 300,
+          easing: "easeout",
+          offset: 540
+        }
+      );
+    }
+
+    const hint = this.state.widgets.timeHint;
 
     if (hint) {
       hint.setProperty(
         prop.MORE,
         {
-          x: 28,
-          y: 151,
-          w: 334,
-          h: 23,
+          y: 154,
           alpha: 0
         }
       );
@@ -920,31 +1165,25 @@ Page({
       animate(
         hint,
         {
-          y: [151, 137],
+          y: [154, 145],
           alpha: [0, 255],
-          duration: 320,
+          duration: 260,
           easing: "easeout",
-          offset: 560
+          offset: 680
         }
       );
     }
 
-
     this.state.widgets.days.forEach(
       (dayWidget, index) => {
         animateGroup(
-          [
-            dayWidget.button,
-            dayWidget.text
-          ],
+          [dayWidget.button, dayWidget.text],
           {
             y: [276, 236],
             alpha: [0, 255],
             duration: 380,
             easing: "easeout",
-            offset:
-              600 +
-              index * 120
+            offset: 600 + index * 120
           }
         );
       }
@@ -1011,6 +1250,46 @@ Page({
     );
   },
 
+  refreshMeta() {
+    const alarm = this.state.alarm;
+    const next = getNextAlarmTime(
+      alarm.hour,
+      alarm.minute,
+      alarm.days
+    );
+
+    if (this.state.widgets.repeatSummary) {
+      this.state.widgets.repeatSummary.setProperty(
+        prop.MORE,
+        {
+          text: getRepeatSummary(alarm.days)
+        }
+      );
+    }
+
+    if (this.state.widgets.timeLabel) {
+      this.state.widgets.timeLabel.setProperty(
+        prop.MORE,
+        {
+          text: alarm.enabled
+            ? "NEXT ALARM"
+            : "ALARM OFF"
+        }
+      );
+    }
+
+    if (this.state.widgets.timeMeta) {
+      this.state.widgets.timeMeta.setProperty(
+        prop.MORE,
+        {
+          text: alarm.enabled
+            ? getNextOccurrenceLabel(next)
+            : "TURN ON TO SCHEDULE"
+        }
+      );
+    }
+  },
+
   refreshDays() {
     if (
       !this.state.widgets.days
@@ -1071,15 +1350,20 @@ Page({
       );
     }
 
-    if (
-      this.state.widgets.switch
-    ) {
-      this.state.widgets.switch.setValue(
-        alarm.enabled
+    this.refreshMeta();
+    this.refreshDays();
+    this.animateAlarmState();
+
+    if (this.state.widgets.timeCard) {
+      this.state.widgets.timeCard.setProperty(
+        prop.MORE,
+        {
+          color: alarm.enabled
+            ? COLORS.blue
+            : COLORS.surface
+        }
       );
     }
-
-    this.refreshDays();
 
     if (this.state.widgets.timeDot) {
       this.state.widgets.timeDot.setProperty(

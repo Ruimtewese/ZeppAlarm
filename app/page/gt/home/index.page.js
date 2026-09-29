@@ -581,6 +581,13 @@ Page({
       );
   },
 
+  onDestroy() {
+    if (this.state.statusTimer) {
+      clearTimeout(this.state.statusTimer);
+      this.state.statusTimer = null;
+    }
+  },
+
   build() {
     setupPage({
       hideStatusBar:
@@ -1234,6 +1241,9 @@ Page({
               scheduleAlarm(
                 alarm
               );
+              this.showStatus("ALARM UPDATED");
+            } else {
+              this.showStatus("TIME UPDATED");
             }
           }
         }

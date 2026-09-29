@@ -585,7 +585,7 @@ Page({
     this.state.widgets.statusText =
       text({
         x: 30,
-        y: 438,
+        y: 428,
         w: 330,
         h: 16,
         value: "",
@@ -668,19 +668,6 @@ Page({
   },
 
   buildDays() {
-    this.state.widgets.repeatLabel =
-      text({
-        x: 20,
-        y: 176,
-        w: 90,
-        h: 22,
-        value: "REPEAT",
-        color: COLORS.muted,
-        size: 13,
-        alignH: horizontalAlign("left"),
-        alignV: verticalAlign("center")
-      });
-
     this.state.widgets.repeatSummary =
       text({
         x: 105,
@@ -781,18 +768,18 @@ Page({
     this.buildOptionSwitch(
       "sound",
       "SOUND",
-      312
+      302
     );
     this.buildOptionSwitch(
       "vibration",
       "VIBRATION",
-      372
+      362
     );
   },
 
   buildMainSwitch() {
     const x = 276;
-    const y = 257;
+    const y = 247;
     const w = 84;
     const h = 34;
     const knob = 26;
@@ -815,7 +802,7 @@ Page({
     const row =
       card({
         x: 18,
-        y: 250,
+        y: 240,
         w: 354,
         h: 48,
         color: COLORS.surface,
@@ -828,7 +815,7 @@ Page({
     const labelWidget =
       text({
         x: 34,
-        y: 250,
+        y: 240,
         w: 90,
         h: 48,
         value: "ALARM",
@@ -956,23 +943,6 @@ Page({
     this.state.widgets[
       alarmKey + "Row"
     ] = row;
-
-    const labelWidget =
-      text({
-        x: 34,
-        y: rowY,
-        w: 90,
-        h: 50,
-        value: label,
-        color: COLORS.text,
-        size: 16,
-        alignH: horizontalAlign("left"),
-        alignV: verticalAlign("center")
-      });
-
-    this.state.widgets.controlLabels.push(
-      labelWidget
-    );
 
     const track =
       card({
@@ -1300,8 +1270,8 @@ Page({
     const x = 276;
     const rowY =
       key === "sound"
-        ? 312
-        : 372;
+        ? 302
+        : 362;
 
     const y =
       rowY + 8;
@@ -1473,7 +1443,7 @@ Page({
           this.state.widgets.alarmSwitchKnob,
 
         x: 276,
-        y: 257
+        y: 247
       },
       {
         track:
@@ -1483,7 +1453,7 @@ Page({
           this.state.widgets.soundSwitchKnob,
 
         x: 276,
-        y: 320
+        y: 310
       },
       {
         track:
@@ -1493,7 +1463,7 @@ Page({
           this.state.widgets.vibrationSwitchKnob,
 
         x: 276,
-        y: 388
+        y: 370
       }
     ];
 

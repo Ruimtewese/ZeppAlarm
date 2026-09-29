@@ -595,23 +595,23 @@ Page({
   buildTime() {
     this.state.widgets.timeCard =
       card({
-        x: 16,
-        y: 16,
-        w: 358,
-        h: 108,
+        x: 20,
+        y: 12,
+        w: 350,
+        h: 82,
         color: COLORS.surface,
-        radius: 32
+        radius: 26
       });
 
     this.state.widgets.timeText =
       text({
         x: 28,
-        y: 54,
+        y: 25,
         w: 334,
-        h: 70,
+        h: 56,
         value: "7:00 AM",
         color: COLORS.blue,
-        size: 64,
+        size: 52,
         font: "fonts/time.ttf",
         alignH: horizontalAlign("center"),
         alignV: verticalAlign("center")

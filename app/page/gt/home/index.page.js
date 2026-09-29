@@ -7,11 +7,8 @@ import {
   timePicker,
   loadObject,
   saveObject,
-  createAudioPlayer,
-  setAudioSource,
-  setAudioVolume,
-  prepareAudio,
-  stopAudio
+  animate,
+  animateGroup
 } from "zeppcore";
 
 import {
@@ -36,9 +33,6 @@ import {
 } from "@zos/alarm";
 
 const STORAGE_KEY = "zepp_alarm";
-
-const SOUND_FILE =
-  "alarm.mp3";
 
 const DAYS = [
   {
@@ -451,59 +445,6 @@ function scheduleAlarm(
   return true;
 }
 
-function testAlarmSound(
-  previousPlayer = null
-) {
-  if (previousPlayer) {
-    try {
-      stopAudio(
-        previousPlayer
-      );
-    } catch (error) {
-      console.log(
-        "Previous test sound stop failed: " +
-        error
-      );
-    }
-  }
-
-  const player =
-    createAudioPlayer();
-
-  setAudioSource(
-    player,
-    SOUND_FILE
-  );
-
-  prepareAudio(
-    player,
-    (ready) => {
-      if (!ready) {
-        try {
-          stopAudio(
-            player
-          );
-        } catch (error) {
-          console.log(
-            "Test sound prepare failed: " +
-            error
-          );
-        }
-        return;
-      }
-
-      setAudioVolume(
-        player,
-        100
-      );
-
-      player.start();
-    }
-  );
-
-  return player;
-}
-
 Page({
   state: {
     alarm: {
@@ -544,6 +485,7 @@ Page({
     this.buildControls();
 
     this.refresh();
+    this.animateOpen();
   },
 
   buildBackground() {
@@ -751,41 +693,8 @@ Page({
           }
       });
 
-    pillAligned({
-      x: 202,
-      y: 288,
-      w: 168,
-      h: 58,
-
-      text:
-        "TEST SOUND",
-
-      horizontal:
-        "center",
-
-      vertical:
-        "center",
-
-      textColor:
-        COLORS.peach,
-
-      textSize:
-        15,
-
-      normalColor:
-        COLORS.surface,
-
-      pressColor:
-        COLORS.surface2,
-
-      radius:
-        29,
-
-      onClick:
-        () => {
-          testAlarmSound();
-        }
-    });
+    this.state.widgets.switch =
+      this.state.widgets.switch;
   },
 
   openTimePicker() {
@@ -915,23 +824,4 @@ Page({
     this.refreshDays();
   },
 
-  onDestroy() {
-    if (
-      this.state.testPlayer
-    ) {
-      try {
-        stopAudio(
-          this.state.testPlayer
-        );
-      } catch (error) {
-        console.log(
-          "Test sound stop failed: " +
-          error
-        );
-      }
-
-      this.state.testPlayer =
-        null;
-    }
-  }
 });

@@ -11,8 +11,7 @@ import {
   saveObject,
   animate,
   animateGroup,
-  popIn,
-  fadeIn
+  popIn
 } from "zeppcore";
 
 import {
@@ -330,54 +329,6 @@ function getRepeatSummary(days) {
   return count + " days/week";
 }
 
-function getNextOccurrenceLabel(date) {
-  const now = new Date();
-  const todayStart = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    0,
-    0,
-    0,
-    0
-  );
-
-  const occurrenceStart = new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate(),
-    0,
-    0,
-    0,
-    0
-  );
-
-  const dayOffset = Math.round(
-    (occurrenceStart.getTime() - todayStart.getTime()) /
-    (24 * 60 * 60 * 1000)
-  );
-
-  if (dayOffset === 0) {
-    return "Today";
-  }
-
-  if (dayOffset === 1) {
-    return "Tomorrow";
-  }
-
-  const names = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday"
-  ];
-
-  return names[date.getDay()];
-}
-
 function getNextAlarmTime(
   hour,
   minute,
@@ -571,8 +522,6 @@ Page({
       timeCard: null,
       timeLabel: null,
       timeText: null,
-      timeHint: null,
-      timeMeta: null,
       repeatLabel: null,
       repeatSummary: null,
       alarmSwitchTrack: null,
@@ -581,6 +530,7 @@ Page({
       soundSwitchKnob: null,
       vibrationSwitchTrack: null,
       vibrationSwitchKnob: null,
+      controlLabels: [],
       statusText: null
     },
   },
@@ -681,47 +631,7 @@ Page({
         alignV: verticalAlign("center")
       });
 
-    this.state.widgets.timeMeta =
-      text({
-        x: 28,
-        y: 119,
-        w: 210,
-        h: 21,
-        value: "TURN ON TO SCHEDULE",
-        color: COLORS.muted,
-        size: 12,
-        alignH: horizontalAlign("left"),
-        alignV: verticalAlign("center")
-      });
-
-    this.state.widgets.timeHint =
-      text({
-        x: 250,
-        y: 137,
-        w: 112,
-        h: 18,
-        value: "TAP TO EDIT",
-        color: COLORS.muted,
-        size: 12,
-        alignH: horizontalAlign("right"),
-        alignV: verticalAlign("center")
-      });
-
     this.state.widgets.timeText.addEventListener(
-      event.CLICK_UP,
-      () => {
-        this.openTimePicker();
-      }
-    );
-
-    this.state.widgets.timeMeta.addEventListener(
-      event.CLICK_UP,
-      () => {
-        this.openTimePicker();
-      }
-    );
-
-    this.state.widgets.timeHint.addEventListener(
       event.CLICK_UP,
       () => {
         this.openTimePicker();
@@ -831,7 +741,7 @@ Page({
     const offX = x + 7;
     const onX = x + w - knob - 7;
 
-    text({
+    const labelWidget = text({
       x: 20,
       y: y,
       w: 240,
@@ -842,6 +752,8 @@ Page({
       alignH: horizontalAlign("left"),
       alignV: verticalAlign("center")
     });
+
+    this.state.widgets.controlLabels.push(labelWidget);
 
     this.state.widgets.alarmSwitchTrack =
       card({
@@ -924,7 +836,7 @@ Page({
     const offX = trackX + 6;
     const onX = trackX + trackW - knobSize - 6;
 
-    text({
+    const labelWidget = text({
       x: 20,
       y: y + 2,
       w: 240,
@@ -935,6 +847,8 @@ Page({
       alignH: horizontalAlign("left"),
       alignV: verticalAlign("center")
     });
+
+    this.state.widgets.controlLabels.push(labelWidget);
 
     const track = card({
       x: trackX,
@@ -1178,6 +1092,9 @@ Page({
   },
 
   animateOpen() {
+    const groupOffset = 0;
+    const groupDuration = 420;
+
     const cardWidget = this.state.widgets.timeCard;
 
     if (cardWidget) {
@@ -1199,23 +1116,21 @@ Page({
         358,
         158,
         {
-          scale: 0.91,
-          duration: 520,
-          easing: "easeout"
+          scale: 0.92,
+          duration: groupDuration,
+          easing: "easeout",
+          offset: groupOffset
         }
       );
     }
 
     const label = this.state.widgets.timeLabel;
-
     if (label) {
       label.setProperty(
         prop.MORE,
         {
           x: 40,
           y: 32,
-          w: 300,
-          h: 22,
           alpha: 0
         }
       );
@@ -1225,84 +1140,155 @@ Page({
         {
           x: [40, 28],
           alpha: [0, 255],
-          duration: 300,
+          duration: groupDuration,
           easing: "easeout",
-          offset: 220
+          offset: groupOffset
         }
       );
     }
 
-    const timeText = this.state.widgets.timeText;
-
-    if (timeText) {
-      timeText.setProperty(
+    const time = this.state.widgets.timeText;
+    if (time) {
+      time.setProperty(
         prop.MORE,
         {
-          x: 28,
           y: 72,
-          w: 334,
-          h: 70,
           alpha: 0
         }
       );
 
       animate(
-        timeText,
+        time,
         {
           y: [72, 54],
           alpha: [0, 255],
-          duration: 520,
+          duration: groupDuration,
           easing: "easeout",
-          offset: 340
+          offset: groupOffset
         }
       );
     }
 
-    const meta = this.state.widgets.timeMeta;
+    const controlOffset = groupDuration + 80;
 
-    if (meta) {
-      meta.setProperty(
+    this.state.widgets.controlLabels.forEach((labelWidget) => {
+      labelWidget.setProperty(
         prop.MORE,
         {
-          y: 130,
+          x: 32,
           alpha: 0
         }
       );
 
       animate(
-        meta,
+        labelWidget,
         {
-          y: [130, 119],
+          x: [32, 20],
           alpha: [0, 255],
-          duration: 300,
+          duration: 320,
           easing: "easeout",
-          offset: 540
+          offset: controlOffset
         }
       );
-    }
+    });
 
-    const hint = this.state.widgets.timeHint;
+    const controls = [
+      {
+        track: this.state.widgets.alarmSwitchTrack,
+        knob: this.state.widgets.alarmSwitchKnob,
+        y: 270,
+        knobY: 277,
+        offset: controlOffset
+      },
+      {
+        track: this.state.widgets.soundSwitchTrack,
+        knob: this.state.widgets.soundSwitchKnob,
+        y: 322,
+        knobY: 328,
+        offset: controlOffset
+      },
+      {
+        track: this.state.widgets.vibrationSwitchTrack,
+        knob: this.state.widgets.vibrationSwitchKnob,
+        y: 372,
+        knobY: 378,
+        offset: controlOffset
+      }
+    ];
 
-    if (hint) {
-      hint.setProperty(
+    controls.forEach((item) => {
+      if (!item.track || !item.knob) {
+        return;
+      }
+
+      item.track.setProperty(
         prop.MORE,
         {
-          y: 145,
+          y: item.y + 12,
+          alpha: 0
+        }
+      );
+
+      item.knob.setProperty(
+        prop.MORE,
+        {
+          y: item.knobY + 12,
           alpha: 0
         }
       );
 
       animate(
-        hint,
+        item.track,
         {
-          y: [145, 137],
+          y: [item.y + 12, item.y],
           alpha: [0, 255],
-          duration: 260,
+          duration: 320,
           easing: "easeout",
-          offset: 680
+          offset: controlOffset
         }
       );
-    }
+
+      animate(
+        item.knob,
+        {
+          y: [item.knobY + 12, item.knobY],
+          alpha: [0, 255],
+          duration: 320,
+          easing: "easeout",
+          offset: controlOffset
+        }
+      );
+    });
+
+    const repeatOffset = controlOffset + 380;
+
+    [
+      this.state.widgets.repeatLabel,
+      this.state.widgets.repeatSummary
+    ].forEach((widget) => {
+      if (!widget) {
+        return;
+      }
+
+      widget.setProperty(
+        prop.MORE,
+        {
+          y: 202,
+          alpha: 0
+        }
+      );
+
+      animate(
+        widget,
+        {
+          y: [202, 190],
+          alpha: [0, 255],
+          duration: 280,
+          easing: "easeout",
+          offset: repeatOffset
+        }
+      );
+    });
 
     this.state.widgets.days.forEach(
       (dayWidget, index) => {
@@ -1313,103 +1299,11 @@ Page({
             alpha: [0, 255],
             duration: 380,
             easing: "easeout",
-            offset: 520 + index * 100
+            offset: repeatOffset + 280 + index * 100
           }
         );
       }
     );
-
-    const optionAnimations = [
-      {
-        track: this.state.widgets.soundSwitchTrack,
-        knob: this.state.widgets.soundSwitchKnob,
-        y: 322,
-        offset: 1220
-      },
-      {
-        track: this.state.widgets.vibrationSwitchTrack,
-        knob: this.state.widgets.vibrationSwitchKnob,
-        y: 372,
-        offset: 1360
-      }
-    ];
-
-    optionAnimations.forEach((item) => {
-      if (!item.track || !item.knob) {
-        return;
-      }
-
-      item.track.setProperty(prop.MORE, {
-        alpha: 0
-      });
-
-      item.knob.setProperty(prop.MORE, {
-        alpha: 0
-      });
-
-      const knobY = item.y +
-        Math.floor((40 - 28) / 2);
-
-      animate(
-        item.track,
-        {
-          y: [item.y + 12, item.y],
-          alpha: [0, 255],
-          duration: 300,
-          easing: "easeout",
-          offset: item.offset
-        }
-      );
-
-      animate(
-        item.knob,
-        {
-          y: [knobY + 12, knobY],
-          alpha: [0, 255],
-          duration: 300,
-          easing: "easeout",
-          offset: item.offset
-        }
-      );
-    });
-
-    [
-      {
-        widget: this.state.widgets.repeatLabel,
-        y: 202,
-        targetY: 190,
-        offset: 450
-      },
-      {
-        widget: this.state.widgets.repeatSummary,
-        y: 202,
-        targetY: 190,
-        offset: 450
-      }
-    ].forEach((item) => {
-      if (!item.widget) {
-        return;
-      }
-
-      item.widget.setProperty(
-        prop.MORE,
-        {
-          y: item.y,
-          alpha: 0
-        }
-      );
-
-      animate(
-        item.widget,
-        {
-          y: [item.y, item.targetY],
-          alpha: [0, 255],
-          duration: 280,
-          easing: "easeout",
-          offset: item.offset
-        }
-      );
-    });
   },
 
   openTimePicker() {
@@ -1477,39 +1371,12 @@ Page({
 
   refreshMeta() {
     const alarm = this.state.alarm;
-    const next = getNextAlarmTime(
-      alarm.hour,
-      alarm.minute,
-      alarm.days
-    );
 
     if (this.state.widgets.repeatSummary) {
       this.state.widgets.repeatSummary.setProperty(
         prop.MORE,
         {
           text: getRepeatSummary(alarm.days)
-        }
-      );
-    }
-
-    if (this.state.widgets.timeLabel) {
-      this.state.widgets.timeLabel.setProperty(
-        prop.MORE,
-        {
-          text: alarm.enabled
-            ? "NEXT ALARM"
-            : "ALARM OFF"
-        }
-      );
-    }
-
-    if (this.state.widgets.timeMeta) {
-      this.state.widgets.timeMeta.setProperty(
-        prop.MORE,
-        {
-          text: alarm.enabled
-            ? getNextOccurrenceLabel(next)
-            : "TURN ON TO SCHEDULE"
         }
       );
     }

@@ -598,7 +598,7 @@ Page({
         x: 16,
         y: 16,
         w: 358,
-        h: 158,
+        h: 108,
         color: COLORS.surface,
         radius: 32
       });

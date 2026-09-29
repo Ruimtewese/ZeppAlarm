@@ -1160,7 +1160,7 @@ Page({
       this.state.alarm.enabled;
 
     const x = 276;
-    const y = 257;
+    const y = 247;
     const w = 84;
     const h = 34;
     const knobSize = 26;

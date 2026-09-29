@@ -1,12 +1,12 @@
 export const COLORS = {
-  background: 0x06090E,
+  background: 0x05070A,
 
-  surface: 0x111826,
-  surface2: 0x182333,
-  border: 0x29374A,
+  surface: 0x10141B,
+  surface2: 0x171D26,
+  border: 0x27313E,
 
   text: 0xF7F8FB,
-  muted: 0x94A2B5,
+  muted: 0x8996A6,
 
   blue: 0x20A0F5,
   bluePressed: 0x1688D4,

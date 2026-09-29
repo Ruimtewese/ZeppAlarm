@@ -1317,13 +1317,13 @@ Page({
       {
         track: this.state.widgets.soundSwitchTrack,
         knob: this.state.widgets.soundSwitchKnob,
-        y: 332,
+        y: 322,
         offset: 1220
       },
       {
         track: this.state.widgets.vibrationSwitchTrack,
         knob: this.state.widgets.vibrationSwitchKnob,
-        y: 382,
+        y: 372,
         offset: 1360
       }
     ];
@@ -1352,32 +1352,47 @@ Page({
         }
       );
     });
-  },
 
     [
-      { widget: this.state.widgets.repeatLabel, y: 202, targetY: 190, offset: 450 },
-      { widget: this.state.widgets.repeatSummary, y: 202, targetY: 190, offset: 450 },
-      { widget: this.state.widgets.statusText, y: 426, targetY: 426, offset: 0 }
+      {
+        widget: this.state.widgets.repeatLabel,
+        y: 202,
+        targetY: 190,
+        offset: 450
+      },
+      {
+        widget: this.state.widgets.repeatSummary,
+        y: 202,
+        targetY: 190,
+        offset: 450
+      }
     ].forEach((item) => {
       if (!item.widget) {
         return;
       }
 
-      if (item.widget === this.state.widgets.statusText) {
-        return;
-      }
+      item.widget.setProperty(
+        prop.MORE,
+        {
+          y: item.y,
+          alpha: 0
+        }
+      );
 
-      item.widget.setProperty(prop.MORE, { y: item.y, alpha: 0 });
-      animate(item.widget, {
-        y: [item.y, item.targetY],
-        alpha: [0, 255],
-        duration: 280,
-        easing: "easeout",
-        offset: item.offset
-      });
+      animate(
+        item.widget,
+        {
+          y: [item.y, item.targetY],
+          alpha: [0, 255],
+          duration: 280,
+          easing: "easeout",
+          offset: item.offset
+        }
+      );
     });
+  },
 
-  openTimePicker() {
+ {
     const alarm =
       this.state.alarm;
 

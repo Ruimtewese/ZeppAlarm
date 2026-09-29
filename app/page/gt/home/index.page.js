@@ -9,7 +9,9 @@ import {
   loadObject,
   saveObject,
   animate,
-  animateGroup
+  animateGroup,
+  popIn,
+  fadeIn
 } from "zeppcore";
 
 import {
@@ -731,6 +733,85 @@ Page({
             this.refresh();
           }
       });
+  },
+
+  animateOpen() {
+    const time =
+      this.state.widgets.time;
+
+    if (time) {
+      popIn(
+        time.button,
+        28,
+        66,
+        334,
+        118,
+        {
+          scale: 0.82,
+          duration: 520,
+          easing: "easeout"
+        }
+      );
+
+      popIn(
+        time.text,
+        28,
+        66,
+        334,
+        118,
+        {
+          scale: 0.82,
+          duration: 520,
+          easing: "easeout"
+        }
+      );
+    }
+
+    this.state.widgets.days.forEach(
+      (dayWidget, index) => {
+        animateGroup(
+          [
+            dayWidget.button,
+            dayWidget.text
+          ],
+          {
+            y: [308, 268],
+            alpha: [0, 255],
+            duration: 320,
+            easing: "easeout",
+            offset:
+              180 +
+              index * 75
+          }
+        );
+      }
+    );
+
+    const control =
+      this.state.widgets.switch;
+
+    if (control) {
+      animate(
+        control.widget,
+        {
+          y: [390, 334],
+          alpha: [0, 255],
+          duration: 420,
+          easing: "easeout",
+          offset: 760
+        }
+      );
+    }
+
+    fadeIn(
+      control
+        ? control.widget
+        : this.state.widgets.time.button,
+      {
+        duration: 260,
+        offset: 0
+      }
+    );
   },
 
   openTimePicker() {

@@ -829,7 +829,7 @@ Page({
       text({
         x: 34,
         y: 248,
-        w: 190,
+        w: 90,
         h: 48,
         value: "ALARM",
         color: COLORS.text,
@@ -961,7 +961,7 @@ Page({
       text({
         x: 34,
         y: rowY,
-        w: 190,
+        w: 90,
         h: 50,
         value: label,
         color: COLORS.text,

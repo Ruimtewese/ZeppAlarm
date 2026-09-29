@@ -459,7 +459,9 @@ Page({
     },
 
     widgets: {
-      days: []
+      days: [],
+      timeLabel: null,
+      repeatLabel: null
     },
   },
 
@@ -511,17 +513,18 @@ Page({
       radius: 42
     });
 
-    text({
-      x: 34,
-      y: 36,
-      w: 322,
-      h: 24,
-      value:
-        "ALARM TIME",
-      color:
-        COLORS.muted,
-      size: 14
-    });
+    this.state.widgets.timeLabel =
+      text({
+        x: 34,
+        y: 36,
+        w: 322,
+        h: 24,
+        value:
+          "ALARM TIME",
+        color:
+          COLORS.muted,
+        size: 14
+      });
 
     this.state.widgets.time =
       pillAligned({
@@ -561,21 +564,18 @@ Page({
   },
 
   buildDays() {
-    text({
-      x: 20,
-      y: 238,
-      w: 350,
-      h: 22,
-      value:
-        "REPEAT",
-      color:
-        COLORS.muted,
-      size: 14,
-      alignH:
-        "center",
-      alignV:
-        "center"
-    });
+    this.state.widgets.repeatLabel =
+      text({
+        x: 20,
+        y: 238,
+        w: 350,
+        h: 22,
+        value:
+          "REPEAT",
+        color:
+          COLORS.muted,
+        size: 14
+      });
 
     const size = 44;
     const gap = 6;
@@ -767,6 +767,30 @@ Page({
       );
     }
 
+    if (
+      this.state.widgets.timeLabel
+    ) {
+      fadeIn(
+        this.state.widgets.timeLabel,
+        {
+          duration: 300,
+          offset: 120
+        }
+      );
+    }
+
+    if (
+      this.state.widgets.repeatLabel
+    ) {
+      fadeIn(
+        this.state.widgets.repeatLabel,
+        {
+          duration: 300,
+          offset: 260
+        }
+      );
+    }
+
     this.state.widgets.days.forEach(
       (dayWidget, index) => {
         animateGroup(
@@ -780,7 +804,7 @@ Page({
             duration: 320,
             easing: "easeout",
             offset:
-              180 +
+              300 +
               index * 75
           }
         );
@@ -798,20 +822,10 @@ Page({
           alpha: [0, 255],
           duration: 420,
           easing: "easeout",
-          offset: 760
+          offset: 920
         }
       );
     }
-
-    fadeIn(
-      control
-        ? control.widget
-        : this.state.widgets.time.button,
-      {
-        duration: 260,
-        offset: 0
-      }
-    );
   },
 
   openTimePicker() {

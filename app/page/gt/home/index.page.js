@@ -781,12 +781,12 @@ Page({
     this.buildOptionSwitch(
       "sound",
       "SOUND",
-      310
+      320
     );
     this.buildOptionSwitch(
       "vibration",
       "VIBRATION",
-      370
+      380
     );
   },
 
@@ -815,7 +815,7 @@ Page({
     const row =
       card({
         x: 18,
-        y: 268,
+        y: 258,
         w: 354,
         h: 48,
         color: COLORS.surface,
@@ -828,7 +828,7 @@ Page({
     const labelWidget =
       text({
         x: 34,
-        y: 268,
+        y: 258,
         w: 90,
         h: 48,
         value: "ALARM",

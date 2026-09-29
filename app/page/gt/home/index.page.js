@@ -5,7 +5,6 @@ import {
   pillAligned,
   card,
   circle,
-  divider,
   switchControl,
   timePicker,
   loadObject,
@@ -468,7 +467,6 @@ Page({
       timeLabel: null,
       timeText: null,
       timeHint: null,
-      timeAccent: null,
       repeatLabel: null
     },
   },
@@ -516,70 +514,61 @@ Page({
         x: 16,
         y: 16,
         w: 358,
-        h: 208,
+        h: 174,
         color:
-          COLORS.surface,
-        radius: 42
+          COLORS.blue,
+        radius: 34
       });
 
     this.state.widgets.timeDot =
       circle({
         centerX: 48,
-        centerY: 53,
-        radius: 7,
+        centerY: 49,
+        radius: 6,
         color:
-          COLORS.blue,
+          0x081018,
         alpha: 255
       });
 
     this.state.widgets.timeLabel =
       text({
         x: 66,
-        y: 39,
+        y: 35,
         w: 285,
         h: 24,
         value:
           "NEXT ALARM",
         color:
-          COLORS.muted,
+          0x43505E,
         size: 14
       });
 
     this.state.widgets.timeText =
       text({
         x: 28,
-        y: 77,
+        y: 62,
         w: 334,
-        h: 82,
+        h: 76,
         value:
           "7:00 AM",
         color:
-          COLORS.blue,
-        size: 70
+          0x111820,
+        size: 64
       });
 
     this.state.widgets.timeHint =
       text({
         x: 28,
-        y: 164,
+        y: 137,
         w: 334,
-        h: 25,
+        h: 23,
         value:
           "TAP TO CHANGE TIME",
         color:
-          COLORS.muted,
+          0x43505E,
         size: 13
       });
 
-    this.state.widgets.timeAccent =
-      divider({
-        x: 28,
-        y: 197,
-        w: 78,
-        h: 4,
-        color:
-          COLORS.blue
-      });
 
     this.state.widgets.timeText.addEventListener(
       event.CLICK_UP,
@@ -600,7 +589,7 @@ Page({
     this.state.widgets.repeatLabel =
       text({
         x: 20,
-        y: 238,
+        y: 208,
         w: 350,
         h: 22,
         value:
@@ -613,7 +602,7 @@ Page({
     const size = 44;
     const gap = 6;
     const startX = 20;
-    const y = 268;
+    const y = 236;
 
     this.state.widgets.days =
       [];
@@ -705,7 +694,7 @@ Page({
     this.state.widgets.switch =
       switchControl({
         x: 20,
-        y: 334,
+        y: 304,
         w: 350,
         h: 72,
 
@@ -777,7 +766,7 @@ Page({
           switchWidget,
           {
             x: [20, 26],
-            y: [334, 338],
+            y: [304, 308],
             w: [350, 338],
             h: [72, 64],
             duration: 110,
@@ -794,7 +783,7 @@ Page({
           switchWidget,
           {
             x: [26, 20],
-            y: [338, 334],
+            y: [308, 304],
             w: [338, 350],
             h: [64, 72],
             duration: 180,
@@ -814,9 +803,9 @@ Page({
         prop.MORE,
         {
           x: 26,
-          y: 24,
+          y: 22,
           w: 338,
-          h: 196,
+          h: 164,
           alpha: 0
         }
       );
@@ -826,7 +815,7 @@ Page({
         16,
         16,
         358,
-        208,
+        174,
         {
           scale: 0.91,
           duration: 520,
@@ -843,9 +832,9 @@ Page({
         prop.MORE,
         {
           center_x: 48,
-          center_y: 53,
-          radius: 7,
-          color: COLORS.blue,
+          center_y: 49,
+          radius: 6,
+          color: 0x081018,
           alpha: 0
         }
       );
@@ -867,7 +856,7 @@ Page({
         prop.MORE,
         {
           x: 78,
-          y: 39,
+          y: 35,
           w: 273,
           h: 24,
           alpha: 0
@@ -894,9 +883,9 @@ Page({
         prop.MORE,
         {
           x: 28,
-          y: 96,
+          y: 82,
           w: 334,
-          h: 82,
+          h: 76,
           alpha: 0
         }
       );
@@ -904,7 +893,7 @@ Page({
       animate(
         timeText,
         {
-          y: [96, 77],
+          y: [82, 62],
           alpha: [0, 255],
           duration: 520,
           easing: "easeout",
@@ -921,9 +910,9 @@ Page({
         prop.MORE,
         {
           x: 28,
-          y: 178,
+          y: 151,
           w: 334,
-          h: 25,
+          h: 23,
           alpha: 0
         }
       );
@@ -931,7 +920,7 @@ Page({
       animate(
         hint,
         {
-          y: [178, 164],
+          y: [151, 137],
           alpha: [0, 255],
           duration: 320,
           easing: "easeout",
@@ -940,32 +929,6 @@ Page({
       );
     }
 
-    const accent =
-      this.state.widgets.timeAccent;
-
-    if (accent) {
-      accent.setProperty(
-        prop.MORE,
-        {
-          x: 28,
-          y: 197,
-          w: 0,
-          h: 4,
-          color: COLORS.blue,
-          alpha: 255
-        }
-      );
-
-      animate(
-        accent,
-        {
-          w: [0, 78],
-          duration: 420,
-          easing: "easeout",
-          offset: 680
-        }
-      );
-    }
 
     this.state.widgets.days.forEach(
       (dayWidget, index) => {
@@ -975,12 +938,12 @@ Page({
             dayWidget.text
           ],
           {
-            y: [308, 268],
+            y: [276, 236],
             alpha: [0, 255],
             duration: 380,
             easing: "easeout",
             offset:
-              760 +
+              600 +
               index * 120
           }
         );
@@ -1117,6 +1080,17 @@ Page({
     }
 
     this.refreshDays();
+
+    if (this.state.widgets.timeDot) {
+      this.state.widgets.timeDot.setProperty(
+        prop.MORE,
+        {
+          color: alarm.enabled
+            ? 0x081018
+            : 0x6D7885
+        }
+      );
+    }
   }
 
 });

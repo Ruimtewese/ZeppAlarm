@@ -164,10 +164,10 @@ Page({
 
     configureTheme({
       background:
-        0x000000,
+        COLORS.background,
 
       surface:
-        0x000000,
+        COLORS.surface,
 
       surface2:
         COLORS.surface2,
@@ -215,7 +215,7 @@ Page({
       w: 390,
       h: 450,
       color:
-        0x000000,
+        COLORS.background,
       radius: 0
     });
   },
@@ -227,7 +227,7 @@ Page({
       w: 350,
       h: 400,
       color:
-        0x000000,
+        COLORS.surface,
       radius: 38
     });
   },
@@ -256,7 +256,7 @@ Page({
           this.state.alarm.minute
         ),
       color:
-        COLORS.text,
+        COLORS.mint,
       size: 58,
       font:
         "fonts/time.ttf"
@@ -276,12 +276,12 @@ Page({
       vertical:
         "center",
       textColor:
-        0x091015,
+        0x10241D,
       textSize: 22,
       normalColor:
-        COLORS.sky,
+        COLORS.mint,
       pressColor:
-        COLORS.skyPressed,
+        COLORS.mintPressed,
       radius: 38,
 
       onClick: () => {

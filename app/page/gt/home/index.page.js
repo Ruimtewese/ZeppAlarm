@@ -961,7 +961,7 @@ Page({
 
   animateSmallSwitchPress() {
     return;
-  }
+  },
 
   toggleAlarm() {
     const alarm =

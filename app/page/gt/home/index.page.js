@@ -596,9 +596,9 @@ Page({
     this.state.widgets.timeCard =
       card({
         x: 20,
-        y: 24,
+        y: 36,
         w: 350,
-        h: 82,
+        h: 100,
         color: COLORS.surface,
         radius: 26
       });
@@ -606,7 +606,7 @@ Page({
     this.state.widgets.timeText =
       text({
         x: 28,
-        y: 37,
+        y: 58,
         w: 334,
         h: 56,
         value: "7:00 AM",
@@ -1088,9 +1088,9 @@ Page({
         prop.MORE,
         {
           x: 27,
-          y: 28,
+          y: 40,
           w: 336,
-          h: 74,
+          h: 92,
           alpha: 0
         }
       );
@@ -1098,9 +1098,9 @@ Page({
       popIn(
         cardWidget,
         20,
-        24,
+        36,
         350,
-        82,
+        100,
         {
           scale: 0.92,
           duration: groupDuration,
@@ -1115,7 +1115,7 @@ Page({
       time.setProperty(
         prop.MORE,
         {
-          y: 54,
+          y: 75,
           alpha: 0
         }
       );
@@ -1123,7 +1123,7 @@ Page({
       animate(
         time,
         {
-          y: [54, 37],
+          y: [75, 58],
           alpha: [0, 255],
           duration: groupDuration,
           easing: "easeout",

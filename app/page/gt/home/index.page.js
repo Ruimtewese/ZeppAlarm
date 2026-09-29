@@ -1392,7 +1392,7 @@ Page({
     });
   },
 
- {
+  openTimePicker() {
     const alarm =
       this.state.alarm;
 

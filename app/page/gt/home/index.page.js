@@ -791,11 +791,11 @@ Page({
   },
 
   buildMainSwitch() {
-    const x = 272;
-    const y = 258;
-    const w = 96;
-    const h = 38;
-    const knob = 28;
+    const x = 153;
+    const y = 255;
+    const w = 84;
+    const h = 34;
+    const knob = 26;
 
     const knobY =
       y +
@@ -921,12 +921,12 @@ Page({
         ? "sound"
         : "vibration";
 
-    const x = 272;
+    const x = 153;
     const trackY =
-      rowY + 6;
-    const w = 96;
-    const h = 38;
-    const knob = 28;
+      rowY + 8;
+    const w = 84;
+    const h = 34;
+    const knob = 26;
 
     const knobY =
       trackY +
@@ -1189,10 +1189,10 @@ Page({
     const enabled =
       this.state.alarm.enabled;
 
-    const x = 272;
-    const y = 258;
-    const w = 96;
-    const h = 38;
+    const x = 153;
+    const y = 255;
+    const w = 84;
+    const h = 34;
     const knobSize = 26;
 
     const knobY =
@@ -1297,17 +1297,17 @@ Page({
       return;
     }
 
-    const x = 272;
+    const x = 153;
     const rowY =
       key === "sound"
         ? 310
         : 370;
 
     const y =
-      rowY + 7;
+      rowY + 8;
 
-    const w = 96;
-    const h = 38;
+    const w = 84;
+    const h = 34;
     const knobSize = 26;
 
     const offX =
@@ -1472,8 +1472,8 @@ Page({
         knob:
           this.state.widgets.alarmSwitchKnob,
 
-        x: 272,
-        y: 258
+        x: 153,
+        y: 255
       },
       {
         track:
@@ -1482,8 +1482,8 @@ Page({
         knob:
           this.state.widgets.soundSwitchKnob,
 
-        x: 272,
-        y: 316
+        x: 153,
+        y: 318
       },
       {
         track:
@@ -1492,8 +1492,8 @@ Page({
         knob:
           this.state.widgets.vibrationSwitchKnob,
 
-        x: 272,
-        y: 376
+        x: 153,
+        y: 378
       }
     ];
 
@@ -1507,18 +1507,41 @@ Page({
         }
 
         const knobSize = 26;
-        const h = 38;
+        const h = 34;
         const knobY =
           item.y +
           Math.floor(
             (h - knobSize) / 2
           );
 
+        const offX =
+          item.x + 6;
+
+        const onX =
+          item.x +
+          84 -
+          knobSize -
+          6;
+
+        const enabled =
+          item.track ===
+            this.state.widgets.alarmSwitchTrack
+            ? this.state.alarm.enabled
+            : item.track ===
+                this.state.widgets.soundSwitchTrack
+              ? this.state.alarm.sound
+              : this.state.alarm.vibration;
+
+        const targetX =
+          enabled
+            ? onX
+            : offX;
+
         item.track.setProperty(
           prop.MORE,
           {
-            x: item.x + 10,
-            y: item.y + 4,
+            x: item.x,
+            y: item.y,
             alpha: 0
           }
         );
@@ -1526,8 +1549,8 @@ Page({
         item.knob.setProperty(
           prop.MORE,
           {
-            x: item.x + 10,
-            y: knobY + 4,
+            x: targetX,
+            y: knobY,
             alpha: 0
           }
         );
@@ -1535,8 +1558,6 @@ Page({
         animate(
           item.track,
           {
-            x: [item.x + 10, item.x],
-            y: [item.y + 4, item.y],
             alpha: [0, 255],
             duration: 280,
             easing: "easeout",
@@ -1547,14 +1568,6 @@ Page({
         animate(
           item.knob,
           {
-            x: [
-              item.x + 10,
-              item.x
-            ],
-            y: [
-              knobY + 4,
-              knobY
-            ],
             alpha: [0, 255],
             duration: 280,
             easing: "easeout",

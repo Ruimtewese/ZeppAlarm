@@ -1049,7 +1049,7 @@ Page({
         radius: 14
       }
     );
-  }
+  },
 
   refreshOptionSwitch(key) {
     const enabled =
@@ -1099,7 +1099,7 @@ Page({
         radius: 14
       }
     );
-  }
+  },
 
   animateOpen() {
     this.state.widgets.days.forEach(
@@ -1151,7 +1151,7 @@ Page({
         );
       }
     );
-  }
+  },
 
   openTimePicker() {
     const alarm =

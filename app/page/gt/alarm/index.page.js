@@ -8,10 +8,6 @@ import {
   exitApp,
 
   vibrateStrong,
-  createSystemSounds,
-  getSystemSoundTypes,
-  playSystemSound,
-  stopSystemSound,
   createAudioPlayer,
   setAudioSource,
   setAudioVolume,
@@ -108,9 +104,6 @@ Page({
       null,
 
     audioRestartTimer:
-      null,
-
-    systemSounds:
       null
   },
 
@@ -167,7 +160,7 @@ Page({
         COLORS.background,
 
       surface:
-        COLORS.surface,
+        COLORS.background,
 
       surface2:
         COLORS.surface2,
@@ -227,7 +220,7 @@ Page({
       w: 350,
       h: 400,
       color:
-        COLORS.surface,
+        COLORS.background,
       radius: 38
     });
   },
@@ -306,9 +299,9 @@ Page({
         COLORS.text,
       textSize: 21,
       normalColor:
-        COLORS.surface,
+        COLORS.background,
       pressColor:
-        COLORS.surface2,
+        COLORS.mintPressed,
       radius: 38,
 
       onClick: () => {
@@ -425,124 +418,86 @@ Page({
   startAlarmSound() {
     this.stopAlarmSound();
 
-    const startCustomSound = () => {
-      if (!this.state.alarm.sound) {
-        return;
-      }
-
-      const player =
-        createAudioPlayer();
-
-      this.state.player =
-        player;
-
-      setAudioSource(
-        player,
-        SOUND_FILE
-      );
-
-      player.addEventListener(
-        player.event.COMPLETE,
-        () => {
-          if (
-            this.state.player !==
-            player
-          ) {
-            return;
-          }
-
-          this.state.audioRestartTimer =
-            setTimeout(
-              () => {
-                if (
-                  this.state.player !==
-                    player ||
-                  !this.state.alarm.sound
-                ) {
-                  return;
-                }
-
-                prepareAudio(
-                  player,
-                  (ready) => {
-                    if (
-                      ready &&
-                      this.state.player ===
-                        player &&
-                      this.state.alarm.sound
-                    ) {
-                      setAudioVolume(
-                        player,
-                        100
-                      );
-
-                      player.start();
-                    }
-                  }
-                );
-              },
-              260
-            );
-        }
-      );
-
-      prepareAudio(
-        player,
-        (ready) => {
-          if (
-            !ready ||
-            this.state.player !==
-              player
-          ) {
-            return;
-          }
-
-          setAudioVolume(
-            player,
-            100
-          );
-
-          player.start();
-        }
-      );
-    };
-
-    try {
-      const systemSounds =
-        createSystemSounds();
-
-      this.state.systemSounds =
-        systemSounds;
-
-      const types =
-        getSystemSoundTypes(
-          systemSounds
-        );
-
-      const played =
-        playSystemSound(
-          types.ALARM,
-          0,
-          systemSounds
-        );
-
-      if (played) {
-        this.state.audioRestartTimer =
-          setTimeout(
-            startCustomSound,
-            520
-          );
-
-        return;
-      }
-    } catch (error) {
-      console.log(
-        "System alarm sound unavailable: " +
-        error
-      );
+    if (!this.state.alarm.sound) {
+      return;
     }
 
-    startCustomSound();
+    const player =
+      createAudioPlayer();
+
+    this.state.player =
+      player;
+
+    setAudioSource(
+      player,
+      SOUND_FILE
+    );
+
+    player.addEventListener(
+      player.event.COMPLETE,
+      () => {
+        if (
+          this.state.player !==
+          player
+        ) {
+          return;
+        }
+
+        this.state.audioRestartTimer =
+          setTimeout(
+            () => {
+              if (
+                this.state.player !==
+                  player ||
+                !this.state.alarm.sound
+              ) {
+                return;
+              }
+
+              prepareAudio(
+                player,
+                (ready) => {
+                  if (
+                    ready &&
+                    this.state.player ===
+                      player &&
+                    this.state.alarm.sound
+                  ) {
+                    setAudioVolume(
+                      player,
+                      100
+                    );
+
+                    player.start();
+                  }
+                }
+              );
+            },
+            260
+          );
+      }
+    );
+
+    prepareAudio(
+      player,
+      (ready) => {
+        if (
+          !ready ||
+          this.state.player !==
+            player ||
+          !this.state.alarm.sound
+        ) {
+          return;
+        }
+
+        setAudioVolume(
+          player,
+          100
+        );
+
+        player.start();
+      }
+    );
   },
 
   stopAlarmSound() {
@@ -567,24 +522,6 @@ Page({
       stopAudio(
         player
       );
-    }
-
-    if (
-      this.state.systemSounds
-    ) {
-      try {
-        stopSystemSound(
-          this.state.systemSounds
-        );
-      } catch (error) {
-        console.log(
-          "System alarm sound stop failed: " +
-          error
-        );
-      }
-
-      this.state.systemSounds =
-        null;
     }
   },
 

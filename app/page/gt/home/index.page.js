@@ -1547,7 +1547,7 @@ Page({
 
   refreshMeta() {
     return;
-  }
+  },
 
   refreshDays() {
     if (

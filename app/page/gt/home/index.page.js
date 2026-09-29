@@ -579,21 +579,6 @@ Page({
         radius: 30
       });
 
-    text({
-      x: 36,
-      y: 28,
-      w: 120,
-      h: 20,
-      value: "ALARM",
-      color:
-        this.state.alarm.enabled
-          ? 0x10241D
-          : COLORS.muted,
-      size: 13,
-      alignH: horizontalAlign("left"),
-      alignV: verticalAlign("center")
-    });
-
     this.state.widgets.timeText =
       text({
         x: 28,
@@ -880,6 +865,23 @@ Page({
     this.state.widgets[
       alarmKey + "Row"
     ] = row;
+
+    const labelWidget =
+      text({
+        x: 34,
+        y: rowY,
+        w: 180,
+        h: 50,
+        value: label,
+        color: COLORS.text,
+        size: 16,
+        alignH: horizontalAlign("left"),
+        alignV: verticalAlign("center")
+      });
+
+    this.state.widgets.controlLabels.push(
+      labelWidget
+    );
 
     const track =
       card({

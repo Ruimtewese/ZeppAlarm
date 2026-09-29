@@ -458,9 +458,6 @@ Page({
     widgets: {
       days: []
     },
-
-    testPlayer:
-      null
   },
 
   onInit() {
@@ -641,13 +638,13 @@ Page({
         value: false,
 
         onColor:
-          COLORS.mint,
+          COLORS.blue,
 
         offColor:
           COLORS.surface2,
 
         pressedOnColor:
-          COLORS.mintPressed,
+          COLORS.bluePressed,
 
         pressedOffColor:
           COLORS.border,
@@ -692,9 +689,6 @@ Page({
             this.refresh();
           }
       });
-
-    this.state.widgets.switch =
-      this.state.widgets.switch;
   },
 
   openTimePicker() {
@@ -822,6 +816,6 @@ Page({
     }
 
     this.refreshDays();
-  },
+  }
 
 });

@@ -565,7 +565,7 @@ Page({
     this.state.widgets.statusText =
       text({
         x: 20,
-        y: 426,
+        y: 432,
         w: 350,
         h: 18,
         value: "",
@@ -628,7 +628,7 @@ Page({
     this.state.widgets.repeatLabel =
       text({
         x: 20,
-        y: 190,
+        y: 205,
         w: 90,
         h: 22,
         value: "REPEAT",
@@ -654,7 +654,7 @@ Page({
     const size = 40;
     const gap = 7;
     const startX = 34;
-    const y = 218;
+    const y = 233;
 
     this.state.widgets.days = [];
 
@@ -707,18 +707,18 @@ Page({
     this.buildOptionSwitch(
       "sound",
       "SOUND",
-      322
+      337
     );
     this.buildOptionSwitch(
       "vibration",
       "VIBRATION",
-      372
+      387
     );
   },
 
   buildMainSwitch() {
     const x = 270;
-    const y = 270;
+    const y = 285;
     const w = 100;
     const h = 44;
     const knob = 30;
@@ -1040,7 +1040,7 @@ Page({
       {
         color: enabled ? COLORS.blue : COLORS.surface2,
         x: trackX,
-        y: Number(key === "sound" ? 322 : 372),
+        y: Number(key === "sound" ? 337 : 387),
         w: trackW,
         h: 40,
         radius: 20
@@ -1110,23 +1110,16 @@ Page({
     }
 
     const time = this.state.widgets.timeText;
+
     if (time) {
       time.setProperty(
         prop.MORE,
         {
-          y: 100,
-          alpha: 0
-        }
-      );
-
-      animate(
-        time,
-        {
-          y: [100, 83],
-          alpha: [0, 255],
-          duration: groupDuration,
-          easing: "easeout",
-          offset: groupOffset
+          x: 28,
+          y: 50,
+          w: 334,
+          h: 60,
+          alpha: 255
         }
       );
     }
@@ -1158,21 +1151,21 @@ Page({
       {
         track: this.state.widgets.alarmSwitchTrack,
         knob: this.state.widgets.alarmSwitchKnob,
-        y: 270,
+        y: 285,
         knobY: 277,
         offset: controlOffset
       },
       {
         track: this.state.widgets.soundSwitchTrack,
         knob: this.state.widgets.soundSwitchKnob,
-        y: 322,
+        y: 337,
         knobY: 328,
         offset: controlOffset
       },
       {
         track: this.state.widgets.vibrationSwitchTrack,
         knob: this.state.widgets.vibrationSwitchKnob,
-        y: 372,
+        y: 387,
         knobY: 378,
         offset: controlOffset
       }

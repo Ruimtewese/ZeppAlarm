@@ -508,13 +508,11 @@ Page({
   state: {
     alarm: {
       ...DEFAULT_ALARM,
-
       days: [
         ...DEFAULT_ALARM.days
       ]
     },
 
-    lastSwitchTap: 0,
     statusTimer: null,
 
     widgets: {
@@ -523,15 +521,21 @@ Page({
       timeText: null,
       repeatLabel: null,
       repeatSummary: null,
+
+      alarmRow: null,
+      soundRow: null,
+      vibrationRow: null,
+
       alarmSwitchTrack: null,
       alarmSwitchKnob: null,
       soundSwitchTrack: null,
       soundSwitchKnob: null,
       vibrationSwitchTrack: null,
       vibrationSwitchKnob: null,
+
       controlLabels: [],
       statusText: null
-    },
+    }
   },
 
   onInit() {
@@ -546,15 +550,31 @@ Page({
 
   onDestroy() {
     if (this.state.statusTimer) {
-      clearTimeout(this.state.statusTimer);
-      this.state.statusTimer = null;
+      clearTimeout(
+        this.state.statusTimer
+      );
+
+      this.state.statusTimer =
+        null;
     }
   },
 
   build() {
     setupPage({
-      hideStatusBar:
-        true
+      hideStatusBar: true
+    });
+
+    configureTheme({
+      background: COLORS.background,
+      surface: COLORS.surface,
+      surface2: COLORS.surface2,
+      accent: COLORS.mint,
+      accentPressed: COLORS.mintPressed,
+      text: COLORS.text,
+      textMuted: COLORS.muted,
+      success: COLORS.mint,
+      border: COLORS.border,
+      radius: 26
     });
 
     this.buildBackground();
@@ -564,15 +584,15 @@ Page({
 
     this.state.widgets.statusText =
       text({
-        x: 20,
-        y: 432,
-        w: 350,
-        h: 18,
+        x: 30,
+        y: 426,
+        w: 330,
+        h: 16,
         value: "",
         color: COLORS.muted,
         size: 12,
         alignH: horizontalAlign("center"),
-        alignV: verticalAlign("bottom"),
+        alignV: verticalAlign("center"),
         alpha: 0
       });
 
@@ -586,8 +606,7 @@ Page({
       y: 0,
       w: 390,
       h: 450,
-      color:
-        0x000000,
+      color: COLORS.background,
       radius: 0
     });
   },
@@ -595,22 +614,46 @@ Page({
   buildTime() {
     this.state.widgets.timeCard =
       card({
-        x: 20,
-        y: 10,
-        w: 350,
-        h: 140,
-        color: COLORS.surface,
-        radius: 26
+        x: 18,
+        y: 14,
+        w: 354,
+        h: 138,
+        color:
+          this.state.alarm.enabled
+            ? COLORS.mint
+            : COLORS.surface,
+        radius: 30
       });
+
+    text({
+      x: 36,
+      y: 28,
+      w: 120,
+      h: 20,
+      value: "ALARM",
+      color:
+        this.state.alarm.enabled
+          ? 0x10241D
+          : COLORS.muted,
+      size: 13,
+      alignH: horizontalAlign("left"),
+      alignV: verticalAlign("center")
+    });
 
     this.state.widgets.timeText =
       text({
         x: 28,
-        y: 50,
+        y: 55,
         w: 334,
-        h: 60,
-        value: "7:00 AM",
-        color: COLORS.blue,
+        h: 66,
+        value: formatAlarmTime(
+          this.state.alarm.hour,
+          this.state.alarm.minute
+        ),
+        color:
+          this.state.alarm.enabled
+            ? 0x10241D
+            : COLORS.mint,
         size: 60,
         alignH: horizontalAlign("center"),
         alignV: verticalAlign("center")
@@ -628,12 +671,12 @@ Page({
     this.state.widgets.repeatLabel =
       text({
         x: 20,
-        y: 205,
+        y: 174,
         w: 90,
         h: 22,
         value: "REPEAT",
         color: COLORS.muted,
-        size: 14,
+        size: 13,
         alignH: horizontalAlign("left"),
         alignV: verticalAlign("center")
       });
@@ -641,11 +684,13 @@ Page({
     this.state.widgets.repeatSummary =
       text({
         x: 105,
-        y: 190,
+        y: 174,
         w: 265,
         h: 22,
-        value: "Every day",
-        color: COLORS.muted,
+        value: getRepeatSummary(
+          this.state.alarm.days
+        ),
+        color: COLORS.text,
         size: 14,
         alignH: horizontalAlign("right"),
         alignV: verticalAlign("center")
@@ -654,7 +699,7 @@ Page({
     const size = 40;
     const gap = 7;
     const startX = 34;
-    const y = 233;
+    const y = 202;
 
     this.state.widgets.days = [];
 
@@ -662,29 +707,54 @@ Page({
       (day, index) => {
         this.state.widgets.days[index] =
           pillAligned({
-            x: startX + index * (size + gap),
+            x:
+              startX +
+              index *
+                (size + gap),
+
             y,
             w: size,
             h: size,
+
             text: day.label,
+
             horizontal: "center",
             vertical: "center",
-            textColor: COLORS.muted,
+
+            textColor:
+              this.state.alarm.days[index]
+                ? 0x10241D
+                : COLORS.muted,
+
             textSize: 16,
-            normalColor: COLORS.surface2,
-            pressColor: COLORS.border,
+
+            normalColor:
+              this.state.alarm.days[index]
+                ? COLORS.mint
+                : COLORS.surface2,
+
+            pressColor:
+              this.state.alarm.days[index]
+                ? COLORS.mintPressed
+                : COLORS.border,
+
             radius: 20,
+
             onClick: () => {
-              const alarm = this.state.alarm;
+              const alarm =
+                this.state.alarm;
 
               if (
                 alarm.days[index] &&
-                getSelectedDayCount(alarm.days) === 1
+                getSelectedDayCount(
+                  alarm.days
+                ) === 1
               ) {
                 return;
               }
 
-              alarm.days[index] = !alarm.days[index];
+              alarm.days[index] =
+                !alarm.days[index];
 
               this.persistAlarm();
               this.refreshDays();
@@ -692,9 +762,13 @@ Page({
 
               if (alarm.enabled) {
                 scheduleAlarm(alarm);
-                this.showStatus("SCHEDULE UPDATED");
+                this.showStatus(
+                  "SCHEDULE UPDATED"
+                );
               } else {
-                this.showStatus("REPEAT UPDATED");
+                this.showStatus(
+                  "REPEAT UPDATED"
+                );
               }
             }
           });
@@ -707,38 +781,66 @@ Page({
     this.buildOptionSwitch(
       "sound",
       "SOUND",
-      337
+      258
     );
     this.buildOptionSwitch(
       "vibration",
       "VIBRATION",
-      387
+      326
     );
   },
 
   buildMainSwitch() {
-    const x = 270;
-    const y = 285;
-    const w = 100;
-    const h = 44;
-    const knob = 30;
-    const knobY = y + Math.floor((h - knob) / 2);
-    const offX = x + 7;
-    const onX = x + w - knob - 7;
+    const x = 272;
+    const y = 258;
+    const w = 96;
+    const h = 42;
+    const knob = 28;
 
-    const labelWidget = text({
-      x: 20,
-      y: y,
-      w: 240,
-      h: h,
-      value: "ALARM",
-      color: COLORS.muted,
-      size: 14,
-      alignH: horizontalAlign("left"),
-      alignV: verticalAlign("center")
-    });
+    const knobY =
+      y +
+      Math.floor(
+        (h - knob) / 2
+      );
 
-    this.state.widgets.controlLabels.push(labelWidget);
+    const offX =
+      x + 6;
+
+    const onX =
+      x +
+      w -
+      knob -
+      6;
+
+    const row =
+      card({
+        x: 18,
+        y: 250,
+        w: 354,
+        h: 56,
+        color: COLORS.surface,
+        radius: 24
+      });
+
+    this.state.widgets.alarmRow =
+      row;
+
+    const labelWidget =
+      text({
+        x: 34,
+        y: 250,
+        w: 190,
+        h: 56,
+        value: "ALARM",
+        color: COLORS.text,
+        size: 16,
+        alignH: horizontalAlign("left"),
+        alignV: verticalAlign("center")
+      });
+
+    this.state.widgets.controlLabels.push(
+      labelWidget
+    );
 
     this.state.widgets.alarmSwitchTrack =
       card({
@@ -747,7 +849,7 @@ Page({
         w,
         h,
         color: COLORS.surface2,
-        radius: 22
+        radius: 21
       });
 
     this.state.widgets.alarmSwitchKnob =
@@ -756,29 +858,31 @@ Page({
         y: knobY,
         w: knob,
         h: knob,
-        color: 0x6D7885,
-        radius: 15
+        color: 0x5B6670,
+        radius: 14
       });
 
-    const toggle = () => {
-      this.toggleAlarm();
-    };
+    const toggle =
+      () => {
+        this.toggleAlarm();
+      };
 
-    const press = (pressed) => {
-      this.animateSmallSwitchPress(
-        this.state.widgets.alarmSwitchTrack,
-        this.state.widgets.alarmSwitchKnob,
-        x,
-        y,
-        w,
-        h,
-        knob,
-        knobY,
-        offX,
-        onX,
-        pressed
-      );
-    };
+    const press =
+      (pressed) => {
+        this.animateSmallSwitchPress(
+          this.state.widgets.alarmSwitchTrack,
+          this.state.widgets.alarmSwitchKnob,
+          x,
+          y,
+          w,
+          h,
+          knob,
+          knobY,
+          offX,
+          onX,
+          pressed
+        );
+      };
 
     this.state.widgets.alarmSwitchTrack.addEventListener(
       event.CLICK_DOWN,
@@ -807,91 +911,159 @@ Page({
     );
   },
 
-  buildOptionSwitch(type, label, y) {
-    const alarmKey = type === "sound"
-      ? "sound"
-      : "vibration";
+  buildOptionSwitch(
+    type,
+    label,
+    rowY
+  ) {
+    const alarmKey =
+      type === "sound"
+        ? "sound"
+        : "vibration";
 
-    const trackX = 270;
-    const trackW = 100;
-    const trackH = 40;
-    const knobSize = 28;
-    const trackY = y;
-    const knobY = y + Math.floor((trackH - knobSize) / 2);
-    const offX = trackX + 6;
-    const onX = trackX + trackW - knobSize - 6;
+    const x = 272;
+    const trackY =
+      rowY + 7;
+    const w = 96;
+    const h = 42;
+    const knob = 28;
 
-    const labelWidget = text({
-      x: 20,
-      y: y + 2,
-      w: 240,
-      h: 36,
-      value: label,
-      color: COLORS.muted,
-      size: 14,
-      alignH: horizontalAlign("left"),
-      alignV: verticalAlign("center")
-    });
-
-    this.state.widgets.controlLabels.push(labelWidget);
-
-    const track = card({
-      x: trackX,
-      y: trackY,
-      w: trackW,
-      h: trackH,
-      color: COLORS.surface2,
-      radius: 20
-    });
-
-    const knob = card({
-      x: offX,
-      y: knobY,
-      w: knobSize,
-      h: knobSize,
-      color: 0x6D7885,
-      radius: 14
-    });
-
-    this.state.widgets[alarmKey + "SwitchTrack"] = track;
-    this.state.widgets[alarmKey + "SwitchKnob"] = knob;
-
-    const toggle = () => {
-      this.state.alarm[alarmKey] = !this.state.alarm[alarmKey];
-      this.persistAlarm();
-      this.refreshOptionSwitch(alarmKey);
-      this.showStatus(
-        label + (this.state.alarm[alarmKey] ? " ON" : " OFF")
+    const knobY =
+      trackY +
+      Math.floor(
+        (h - knob) / 2
       );
-    };
 
-    const press = (pressed) => {
-      this.animateSmallSwitchPress(
-        track,
-        knob,
-        trackX,
-        trackY,
-        trackW,
-        trackH,
-        knobSize,
-        knobY,
-        offX,
-        onX,
-        pressed
-      );
-    };
+    const offX =
+      x + 6;
 
-    track.addEventListener(event.CLICK_DOWN, () => press(true));
-    track.addEventListener(event.CLICK_UP, () => {
-      press(false);
-      toggle();
-    });
+    const onX =
+      x +
+      w -
+      knob -
+      6;
 
-    knob.addEventListener(event.CLICK_DOWN, () => press(true));
-    knob.addEventListener(event.CLICK_UP, () => {
-      press(false);
-      toggle();
-    });
+    const row =
+      card({
+        x: 18,
+        y: rowY,
+        w: 354,
+        h: 56,
+        color: COLORS.surface,
+        radius: 24
+      });
+
+    this.state.widgets[
+      alarmKey + "Row"
+    ] = row;
+
+    const labelWidget =
+      text({
+        x: 34,
+        y: rowY,
+        w: 190,
+        h: 56,
+        value: label,
+        color: COLORS.text,
+        size: 16,
+        alignH: horizontalAlign("left"),
+        alignV: verticalAlign("center")
+      });
+
+    this.state.widgets.controlLabels.push(
+      labelWidget
+    );
+
+    const track =
+      card({
+        x,
+        y: trackY,
+        w,
+        h,
+        color: COLORS.surface2,
+        radius: 21
+      });
+
+    const knobWidget =
+      card({
+        x: offX,
+        y: knobY,
+        w: knob,
+        h: knob,
+        color: 0x5B6670,
+        radius: 14
+      });
+
+    this.state.widgets[
+      alarmKey + "SwitchTrack"
+    ] = track;
+
+    this.state.widgets[
+      alarmKey + "SwitchKnob"
+    ] = knobWidget;
+
+    const toggle =
+      () => {
+        this.state.alarm[alarmKey] =
+          !this.state.alarm[alarmKey];
+
+        this.persistAlarm();
+        this.refreshOptionSwitch(
+          alarmKey
+        );
+
+        this.showStatus(
+          label +
+          (
+            this.state.alarm[alarmKey]
+              ? " ON"
+              : " OFF"
+          )
+        );
+      };
+
+    const press =
+      (pressed) => {
+        this.animateSmallSwitchPress(
+          track,
+          knobWidget,
+          x,
+          trackY,
+          w,
+          h,
+          knob,
+          knobY,
+          offX,
+          onX,
+          pressed
+        );
+      };
+
+    track.addEventListener(
+      event.CLICK_DOWN,
+      () => press(true)
+    );
+
+    track.addEventListener(
+      event.CLICK_UP,
+      () => {
+        press(false);
+        toggle();
+      }
+    );
+
+    knobWidget.addEventListener(
+      event.CLICK_DOWN,
+      () => press(true)
+    );
+
+    knobWidget.addEventListener(
+      event.CLICK_UP,
+      () => {
+        press(false);
+        toggle();
+      }
+    );
   },
 
   animateSmallSwitchPress(
@@ -907,28 +1079,40 @@ Page({
     onX,
     pressed
   ) {
-    const centerY = y + h / 2;
-    const knobPressedSize = Math.max(20, knobSize - 4);
-    const normalY = centerY - knobSize / 2;
-    const pressedY = centerY - knobPressedSize / 2;
+    const centerY =
+      y + h / 2;
+
+    const pressedSize =
+      Math.max(
+        20,
+        knobSize - 4
+      );
+
+    const normalY =
+      centerY -
+      knobSize / 2;
+
+    const pressedY =
+      centerY -
+      pressedSize / 2;
 
     animate(
       track,
       pressed
         ? {
-            x: [x, x + 4],
+            x: [x, x + 3],
             y: [y, y + 2],
-            w: [w, w - 8],
+            w: [w, w - 6],
             h: [h, h - 4],
-            duration: 100,
+            duration: 90,
             easing: "easeout"
           }
         : {
-            x: [x + 4, x],
+            x: [x + 3, x],
             y: [y + 2, y],
-            w: [w - 8, w],
+            w: [w - 6, w],
             h: [h - 4, h],
-            duration: 150,
+            duration: 140,
             easing: "easeout"
           }
     );
@@ -938,128 +1122,137 @@ Page({
       pressed
         ? {
             y: [normalY, pressedY],
-            w: [knobSize, knobPressedSize],
-            h: [knobSize, knobPressedSize],
-            duration: 100,
+            w: [knobSize, pressedSize],
+            h: [knobSize, pressedSize],
+            duration: 90,
             easing: "easeout"
           }
         : {
             y: [pressedY, normalY],
-            w: [knobPressedSize, knobSize],
-            h: [knobPressedSize, knobSize],
-            duration: 150,
+            w: [pressedSize, knobSize],
+            h: [pressedSize, knobSize],
+            duration: 140,
             easing: "easeout"
           }
     );
   },
 
   toggleAlarm() {
-    const alarm = this.state.alarm;
-    alarm.enabled = !alarm.enabled;
+    const alarm =
+      this.state.alarm;
 
-    const ok = scheduleAlarm(alarm);
+    alarm.enabled =
+      !alarm.enabled;
+
+    const ok =
+      scheduleAlarm(
+        alarm
+      );
 
     if (!ok) {
-      alarm.enabled = false;
+      alarm.enabled =
+        false;
+
       this.refresh();
-      this.showStatus("COULD NOT SCHEDULE");
+
+      this.showStatus(
+        "COULD NOT SCHEDULE"
+      );
+
       return;
     }
 
     this.refresh();
+
     this.animateAlarmState();
-    this.showStatus(alarm.enabled ? "ALARM SCHEDULED" : "ALARM OFF");
+
+    this.showStatus(
+      alarm.enabled
+        ? "ALARM SCHEDULED"
+        : "ALARM OFF"
+    );
   },
 
-  animateAlarmState(animated = true) {
-    const track = this.state.widgets.alarmSwitchTrack;
-    const knob = this.state.widgets.alarmSwitchKnob;
+  animateAlarmState(
+    animated = true
+  ) {
+    const track =
+      this.state.widgets.alarmSwitchTrack;
+
+    const knob =
+      this.state.widgets.alarmSwitchKnob;
 
     if (!track || !knob) {
       return;
     }
 
-    const enabled = this.state.alarm.enabled;
-    const x = 270;
-    const y = 270;
-    const w = 100;
-    const h = 44;
-    const knobSize = 30;
-    const knobY = y + Math.floor((h - knobSize) / 2);
-    const offX = x + 7;
-    const onX = x + w - knobSize - 7;
-    const targetX = enabled ? onX : offX;
-    const currentX = enabled ? offX : onX;
+    const enabled =
+      this.state.alarm.enabled;
+
+    const x = 272;
+    const y = 258;
+    const w = 96;
+    const h = 42;
+    const knobSize = 28;
+
+    const knobY =
+      y +
+      Math.floor(
+        (h - knobSize) / 2
+      );
+
+    const offX =
+      x + 6;
+
+    const onX =
+      x +
+      w -
+      knobSize -
+      6;
+
+    const targetX =
+      enabled
+        ? onX
+        : offX;
+
+    const currentX =
+      enabled
+        ? offX
+        : onX;
 
     track.setProperty(
       prop.MORE,
       {
-        color: enabled ? COLORS.blue : COLORS.surface2,
-        x, y, w, h, radius: 22
+        color:
+          enabled
+            ? COLORS.mint
+            : COLORS.surface2,
+
+        x,
+        y,
+        w,
+        h,
+        radius: 21
       }
     );
 
     knob.setProperty(
       prop.MORE,
       {
-        x: animated ? currentX : targetX,
+        x:
+          animated
+            ? currentX
+            : targetX,
+
         y: knobY,
         w: knobSize,
         h: knobSize,
-        color: enabled ? 0x081018 : 0x6D7885,
-        radius: 15
-      }
-    );
 
-    if (animated) {
-      animate(knob, {
-        x: [currentX, targetX],
-        duration: 300,
-        easing: "easeout"
-      });
-    }
-  },
+        color:
+          enabled
+            ? 0x10241D
+            : 0x5B6670,
 
-  refreshOptionSwitch(key, animated = true) {
-    const enabled = Boolean(this.state.alarm[key]);
-    const track = this.state.widgets[key + "SwitchTrack"];
-    const knob = this.state.widgets[key + "SwitchKnob"];
-
-    if (!track || !knob) {
-      return;
-    }
-
-    const trackX = 270;
-    const trackW = 100;
-    const knobSize = 28;
-    const offX = trackX + 6;
-    const onX = trackX + trackW - knobSize - 6;
-
-    track.setProperty(
-      prop.MORE,
-      {
-        color: enabled ? COLORS.blue : COLORS.surface2,
-        x: trackX,
-        y: Number(key === "sound" ? 337 : 387),
-        w: trackW,
-        h: 40,
-        radius: 20
-      }
-    );
-
-    const targetX = enabled ? onX : offX;
-    const currentX = enabled ? offX : onX;
-
-    knob.setProperty(
-      prop.MORE,
-      {
-        x: animated ? currentX : targetX,
-        y:
-          Number(key === "sound" ? 322 : 372) +
-          Math.floor((40 - knobSize) / 2),
-        w: knobSize,
-        h: knobSize,
-        color: enabled ? 0x081018 : 0x6D7885,
         radius: 14
       }
     );
@@ -1068,7 +1261,125 @@ Page({
       animate(
         knob,
         {
-          x: [currentX, targetX],
+          x: [
+            currentX,
+            targetX
+          ],
+          duration: 300,
+          easing: "easeout"
+        }
+      );
+    }
+  },
+
+  refreshOptionSwitch(
+    key,
+    animated = true
+  ) {
+    const enabled =
+      Boolean(
+        this.state.alarm[key]
+      );
+
+    const track =
+      this.state.widgets[
+        key +
+        "SwitchTrack"
+      ];
+
+    const knob =
+      this.state.widgets[
+        key +
+        "SwitchKnob"
+      ];
+
+    if (!track || !knob) {
+      return;
+    }
+
+    const x = 272;
+    const rowY =
+      key === "sound"
+        ? 258 + 68
+        : 258 + 68 + 68;
+
+    const y =
+      rowY + 7;
+
+    const w = 96;
+    const h = 42;
+    const knobSize = 28;
+
+    const offX =
+      x + 6;
+
+    const onX =
+      x +
+      w -
+      knobSize -
+      6;
+
+    const knobY =
+      y +
+      Math.floor(
+        (h - knobSize) / 2
+      );
+
+    const targetX =
+      enabled
+        ? onX
+        : offX;
+
+    const currentX =
+      enabled
+        ? offX
+        : onX;
+
+    track.setProperty(
+      prop.MORE,
+      {
+        color:
+          enabled
+            ? COLORS.mint
+            : COLORS.surface2,
+
+        x,
+        y,
+        w,
+        h,
+        radius: 21
+      }
+    );
+
+    knob.setProperty(
+      prop.MORE,
+      {
+        x:
+          animated
+            ? currentX
+            : targetX,
+
+        y: knobY,
+        w: knobSize,
+        h: knobSize,
+
+        color:
+          enabled
+            ? 0x10241D
+            : 0x5B6670,
+
+        radius: 14
+      }
+    );
+
+    if (animated) {
+      animate(
+        knob,
+        {
+          x: [
+            currentX,
+            targetX
+          ],
           duration: 260,
           easing: "easeout"
         }
@@ -1077,156 +1388,177 @@ Page({
   },
 
   animateOpen() {
-    const groupOffset = 0;
-    const groupDuration = 420;
-
-    const cardWidget = this.state.widgets.timeCard;
+    const cardWidget =
+      this.state.widgets.timeCard;
 
     if (cardWidget) {
-      cardWidget.setProperty(
-        prop.MORE,
-        {
-          x: 27,
-          y: 18,
-          w: 336,
-          h: 132,
-          alpha: 0
-        }
-      );
-
       popIn(
         cardWidget,
-        20,
-        36,
-        350,
-        150,
+        18,
+        14,
+        354,
+        138,
         {
-          scale: 0.92,
-          duration: groupDuration,
-          easing: "easeout",
-          offset: groupOffset
+          scale: 0.95,
+          duration: 360,
+          easing: "easeout"
         }
       );
     }
 
-    const time = this.state.widgets.timeText;
+    const rows = [
+      this.state.widgets.alarmRow,
+      this.state.widgets.soundRow,
+      this.state.widgets.vibrationRow
+    ];
 
-    if (time) {
-      time.setProperty(
-        prop.MORE,
-        {
-          x: 28,
-          y: 50,
-          w: 334,
-          h: 60,
-          alpha: 255
+    rows.forEach(
+      (row, index) => {
+        if (!row) {
+          return;
         }
-      );
-    }
 
-    const controlOffset = groupDuration + 80;
+        row.setProperty(
+          prop.MORE,
+          {
+            x: 26,
+            alpha: 0
+          }
+        );
 
-    this.state.widgets.controlLabels.forEach((labelWidget) => {
-      labelWidget.setProperty(
-        prop.MORE,
-        {
-          x: 32,
-          alpha: 0
-        }
-      );
+        animate(
+          row,
+          {
+            x: [26, 18],
+            alpha: [0, 255],
+            duration: 280,
+            easing: "easeout",
+            offset:
+              420 +
+              index * 70
+          }
+        );
+      }
+    );
 
-      animate(
-        labelWidget,
-        {
-          x: [32, 20],
-          alpha: [0, 255],
-          duration: 320,
-          easing: "easeout",
-          offset: controlOffset
-        }
-      );
-    });
+    this.state.widgets.controlLabels.forEach(
+      (labelWidget) => {
+        labelWidget.setProperty(
+          prop.MORE,
+          {
+            x: 42,
+            alpha: 0
+          }
+        );
 
-    const controls = [
+        animate(
+          labelWidget,
+          {
+            x: [42, 34],
+            alpha: [0, 255],
+            duration: 280,
+            easing: "easeout",
+            offset: 420
+          }
+        );
+      }
+    );
+
+    const switches = [
       {
-        track: this.state.widgets.alarmSwitchTrack,
-        knob: this.state.widgets.alarmSwitchKnob,
-        y: 285,
-        knobY: 277,
-        offset: controlOffset
+        track:
+          this.state.widgets.alarmSwitchTrack,
+
+        knob:
+          this.state.widgets.alarmSwitchKnob,
+
+        x: 272,
+        y: 258
       },
       {
-        track: this.state.widgets.soundSwitchTrack,
-        knob: this.state.widgets.soundSwitchKnob,
-        y: 337,
-        knobY: 328,
-        offset: controlOffset
+        track:
+          this.state.widgets.soundSwitchTrack,
+
+        knob:
+          this.state.widgets.soundSwitchKnob,
+
+        x: 272,
+        y: 333
       },
       {
-        track: this.state.widgets.vibrationSwitchTrack,
-        knob: this.state.widgets.vibrationSwitchKnob,
-        y: 387,
-        knobY: 378,
-        offset: controlOffset
+        track:
+          this.state.widgets.vibrationSwitchTrack,
+
+        knob:
+          this.state.widgets.vibrationSwitchKnob,
+
+        x: 272,
+        y: 401
       }
     ];
 
-    controls.forEach((item) => {
-      if (!item.track || !item.knob) {
-        return;
-      }
-
-      item.track.setProperty(
-        prop.MORE,
-        {
-          y: item.y + 12,
-          alpha: 0
+    switches.forEach(
+      (item) => {
+        if (
+          !item.track ||
+          !item.knob
+        ) {
+          return;
         }
-      );
 
-      item.knob.setProperty(
-        prop.MORE,
-        {
-          y: item.knobY + 12,
-          alpha: 0
-        }
-      );
+        const knobSize = 28;
+        const h = 42;
+        const knobY =
+          item.y +
+          Math.floor(
+            (h - knobSize) / 2
+          );
 
-      animate(
-        item.track,
-        {
-          y: [item.y + 12, item.y],
-          alpha: [0, 255],
-          duration: 320,
-          easing: "easeout",
-          offset: controlOffset
-        }
-      );
-
-      animate(
-        item.knob,
-        {
-          y: [item.knobY + 12, item.knobY],
-          alpha: [0, 255],
-          duration: 320,
-          easing: "easeout",
-          offset: controlOffset
-        }
-      );
-    });
-
-    const repeatOffset = controlOffset + 380;
-
-    this.state.widgets.days.forEach(
-      (dayWidget, index) => {
-        animateGroup(
-          [dayWidget.button, dayWidget.text],
+        item.track.setProperty(
+          prop.MORE,
           {
-            y: [258, 218],
+            x: item.x + 10,
+            y: item.y + 4,
+            alpha: 0
+          }
+        );
+
+        item.knob.setProperty(
+          prop.MORE,
+          {
+            x: item.x + 10,
+            y: knobY + 4,
+            alpha: 0
+          }
+        );
+
+        animate(
+          item.track,
+          {
+            x: [item.x + 10, item.x],
+            y: [item.y + 4, item.y],
             alpha: [0, 255],
-            duration: 380,
+            duration: 280,
             easing: "easeout",
-            offset: repeatOffset + index * 100
+            offset: 420
+          }
+        );
+
+        animate(
+          item.knob,
+          {
+            x: [
+              item.x + 10,
+              item.x
+            ],
+            y: [
+              knobY + 4,
+              knobY
+            ],
+            alpha: [0, 255],
+            duration: 280,
+            easing: "easeout",
+            offset: 420
           }
         );
       }
@@ -1238,17 +1570,10 @@ Page({
       this.state.alarm;
 
     timePicker({
-      title:
-        "Alarm time",
+      title: "Alarm time",
 
-      hour:
-        alarm.hour,
-
-      minute:
-        alarm.minute,
-
-      font:
-        "fonts/time.ttf",
+      hour: alarm.hour,
+      minute: alarm.minute,
 
       onChange:
         ({
@@ -1272,20 +1597,21 @@ Page({
 
           this.refresh();
 
-          if (
-            eventType === 2
-          ) {
+          if (eventType === 2) {
             this.persistAlarm();
 
-            if (
-              alarm.enabled
-            ) {
+            if (alarm.enabled) {
               scheduleAlarm(
                 alarm
               );
-              this.showStatus("ALARM UPDATED");
+
+              this.showStatus(
+                "ALARM UPDATED"
+              );
             } else {
-              this.showStatus("TIME UPDATED");
+              this.showStatus(
+                "TIME UPDATED"
+              );
             }
           }
         }
@@ -1300,13 +1626,16 @@ Page({
   },
 
   refreshMeta() {
-    const alarm = this.state.alarm;
-
-    if (this.state.widgets.repeatSummary) {
+    if (
+      this.state.widgets.repeatSummary
+    ) {
       this.state.widgets.repeatSummary.setProperty(
         prop.MORE,
         {
-          text: getRepeatSummary(alarm.days)
+          text:
+            getRepeatSummary(
+              this.state.alarm.days
+            )
         }
       );
     }
@@ -1326,8 +1655,7 @@ Page({
       ) => {
         const selected =
           Boolean(
-            this.state.alarm
-              .days[index]
+            this.state.alarm.days[index]
           );
 
         dayWidget.button.setProperty(
@@ -1335,7 +1663,7 @@ Page({
           {
             color:
               selected
-                ? COLORS.blue
+                ? COLORS.mint
                 : COLORS.surface2
           }
         );
@@ -1345,7 +1673,7 @@ Page({
           {
             color:
               selected
-                ? 0x081018
+                ? 0x10241D
                 : COLORS.muted
           }
         );
@@ -1357,9 +1685,7 @@ Page({
     const alarm =
       this.state.alarm;
 
-    if (
-      this.state.widgets.timeText
-    ) {
+    if (this.state.widgets.timeText) {
       this.state.widgets.timeText.setProperty(
         prop.MORE,
         {
@@ -1368,42 +1694,77 @@ Page({
               alarm.hour,
               alarm.minute
             ),
-          color: alarm.enabled
-            ? 0x111820
-            : COLORS.blue,
-          font: "fonts/time.ttf"
+          color:
+            alarm.enabled
+              ? 0x10241D
+              : COLORS.mint
+        }
+      );
+    }
+
+    if (this.state.widgets.timeCard) {
+      this.state.widgets.timeCard.setProperty(
+        prop.MORE,
+        {
+          color:
+            alarm.enabled
+              ? COLORS.mint
+              : COLORS.surface
         }
       );
     }
 
     this.refreshMeta();
     this.refreshDays();
+
     this.animateAlarmState(false);
-    this.refreshOptionSwitch("sound", false);
-    this.refreshOptionSwitch("vibration", false);
+    this.refreshOptionSwitch(
+      "sound",
+      false
+    );
+    this.refreshOptionSwitch(
+      "vibration",
+      false
+    );
+  },
 
-    if (this.state.widgets.timeCard) {
-      this.state.widgets.timeCard.setProperty(
-        prop.MORE,
-        {
-          color: alarm.enabled
-            ? COLORS.blue
-            : COLORS.surface
-        }
+  showStatus(message) {
+    const status =
+      this.state.widgets.statusText;
+
+    if (!status) {
+      return;
+    }
+
+    status.setProperty(
+      prop.MORE,
+      {
+        text: String(message),
+        alpha: 255
+      }
+    );
+
+    if (this.state.statusTimer) {
+      clearTimeout(
+        this.state.statusTimer
       );
     }
 
-    if (this.state.widgets.timeText) {
-      this.state.widgets.timeText.setProperty(
-        prop.MORE,
-        {
-          color: alarm.enabled
-            ? 0x111820
-            : COLORS.blue
-        }
+    this.state.statusTimer =
+      setTimeout(
+        () => {
+          if (status) {
+            animate(
+              status,
+              {
+                alpha: [255, 0],
+                duration: 250,
+                easing: "easeout"
+              }
+            );
+          }
+        },
+        1000
       );
-    }
-
   }
-
 });

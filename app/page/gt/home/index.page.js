@@ -286,49 +286,6 @@ function getSelectedDayCount(
   ).length;
 }
 
-function getRepeatSummary(days) {
-  const count = getSelectedDayCount(days);
-
-  if (count === 7) {
-    return "Every day";
-  }
-
-  const weekdays = [
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    false
-  ];
-
-  const weekends = [
-    false,
-    false,
-    false,
-    false,
-    false,
-    true,
-    true
-  ];
-
-  if (days.every((value, index) => value === weekdays[index])) {
-    return "Weekdays";
-  }
-
-  if (days.every((value, index) => value === weekends[index])) {
-    return "Weekends";
-  }
-
-  if (count === 1) {
-    const index = days.findIndex(Boolean);
-    return DAYS[index].key.charAt(0) + DAYS[index].key.slice(1).toLowerCase();
-  }
-
-  return count + " days/week";
-}
-
 function getNextAlarmTime(
   hour,
   minute,
@@ -519,9 +476,6 @@ Page({
       days: [],
       timeCard: null,
       timeText: null,
-      repeatLabel: null,
-      repeatSummary: null,
-
       alarmRow: null,
       soundRow: null,
       vibrationRow: null,
@@ -668,25 +622,10 @@ Page({
   },
 
   buildDays() {
-    this.state.widgets.repeatSummary =
-      text({
-        x: 105,
-        y: 176,
-        w: 265,
-        h: 22,
-        value: getRepeatSummary(
-          this.state.alarm.days
-        ),
-        color: COLORS.text,
-        size: 14,
-        alignH: horizontalAlign("right"),
-        alignV: verticalAlign("center")
-      });
-
     const size = 40;
     const gap = 7;
     const startX = 34;
-    const y = 204;
+    const y = 180;
 
     this.state.widgets.days = [];
 
@@ -745,8 +684,6 @@ Page({
 
               this.persistAlarm();
               this.refreshDays();
-              this.refreshMeta();
-
               if (alarm.enabled) {
                 scheduleAlarm(alarm);
                 this.showStatus(
@@ -1609,20 +1546,8 @@ Page({
   },
 
   refreshMeta() {
-    if (
-      this.state.widgets.repeatSummary
-    ) {
-      this.state.widgets.repeatSummary.setProperty(
-        prop.MORE,
-        {
-          text:
-            getRepeatSummary(
-              this.state.alarm.days
-            )
-        }
-      );
-    }
-  },
+    return;
+  }
 
   refreshDays() {
     if (
@@ -1697,7 +1622,6 @@ Page({
       );
     }
 
-    this.refreshMeta();
     this.refreshDays();
 
     this.animateAlarmState(false);

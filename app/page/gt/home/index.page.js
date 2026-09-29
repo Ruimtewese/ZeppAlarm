@@ -1309,7 +1309,7 @@ Page({
 
         const startY = 198;
         const endY = 180;
-        const delay = 320 + index * 65;
+        const delay = 450 + index * 90;
 
         dayWidget.button.setProperty(
           prop.MORE,
@@ -1332,7 +1332,7 @@ Page({
           {
             y: [startY, endY],
             alpha: [0, 255],
-            duration: 240,
+            duration: 360,
             easing: "easeout",
             offset: delay
           }
@@ -1343,7 +1343,7 @@ Page({
           {
             y: [startY, endY],
             alpha: [0, 255],
-            duration: 240,
+            duration: 360,
             easing: "easeout",
             offset: delay
           }

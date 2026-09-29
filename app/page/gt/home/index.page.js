@@ -15,7 +15,8 @@ import {
 } from "zeppcore";
 
 import {
-  prop
+  prop,
+  event
 } from "@zos/ui";
 
 import {
@@ -733,6 +734,43 @@ Page({
             this.refresh();
           }
       });
+
+    const switchWidget =
+      this.state.widgets.switch.widget;
+
+    switchWidget.addEventListener(
+      event.CLICK_DOWN,
+      () => {
+        animate(
+          switchWidget,
+          {
+            x: [20, 26],
+            y: [334, 338],
+            w: [350, 338],
+            h: [72, 64],
+            duration: 110,
+            easing: "easeout"
+          }
+        );
+      }
+    );
+
+    switchWidget.addEventListener(
+      event.CLICK_UP,
+      () => {
+        animate(
+          switchWidget,
+          {
+            x: [26, 20],
+            y: [338, 334],
+            w: [338, 350],
+            h: [64, 72],
+            duration: 180,
+            easing: "easeout"
+          }
+        );
+      }
+    );
   },
 
   animateOpen() {
@@ -801,31 +839,16 @@ Page({
           {
             y: [308, 268],
             alpha: [0, 255],
-            duration: 320,
+            duration: 380,
             easing: "easeout",
             offset:
-              300 +
-              index * 75
+              360 +
+              index * 120
           }
         );
       }
     );
 
-    const control =
-      this.state.widgets.switch;
-
-    if (control) {
-      animate(
-        control.widget,
-        {
-          y: [390, 334],
-          alpha: [0, 255],
-          duration: 420,
-          easing: "easeout",
-          offset: 920
-        }
-      );
-    }
   },
 
   openTimePicker() {

@@ -1309,7 +1309,7 @@ Page({
 
         const startY = 198;
         const endY = 180;
-        const delay = 230 + index * 65;
+        const delay = 320 + index * 65;
 
         dayWidget.button.setProperty(
           prop.MORE,

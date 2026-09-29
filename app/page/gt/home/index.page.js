@@ -518,11 +518,7 @@ Page({
         "ALARM TIME",
       color:
         COLORS.muted,
-      size: 14,
-      alignH:
-        "center",
-      alignV:
-        "center"
+      size: 14
     });
 
     this.state.widgets.time =

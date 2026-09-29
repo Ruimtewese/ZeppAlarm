@@ -1262,9 +1262,6 @@ Page({
 
     const repeatOffset = controlOffset + 380;
 
-
-    const repeatOffset = controlOffset + 380;
-
     this.state.widgets.days.forEach(
       (dayWidget, index) => {
         animateGroup(

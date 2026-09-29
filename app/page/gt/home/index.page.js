@@ -821,19 +821,19 @@ Page({
   },
 
   buildMainSwitch() {
-    const x = 240;
+    const x = 270;
     const y = 270;
-    const w = 130;
+    const w = 100;
     const h = 44;
     const knob = 30;
-    const knobY = y + 7;
+    const knobY = y + Math.floor((h - knob) / 2);
     const offX = x + 7;
     const onX = x + w - knob - 7;
 
     text({
       x: 20,
       y: y,
-      w: 190,
+      w: 240,
       h: h,
       value: "ALARM",
       color: COLORS.muted,
@@ -914,19 +914,19 @@ Page({
       ? "sound"
       : "vibration";
 
-    const trackX = 240;
-    const trackW = 130;
+    const trackX = 270;
+    const trackW = 100;
     const trackH = 40;
     const knobSize = 28;
     const trackY = y;
-    const knobY = y + 6;
+    const knobY = y + Math.floor((trackH - knobSize) / 2);
     const offX = trackX + 6;
     const onX = trackX + trackW - knobSize - 6;
 
     text({
       x: 20,
       y: y + 2,
-      w: 190,
+      w: 240,
       h: 36,
       value: label,
       color: COLORS.muted,
@@ -1007,6 +1007,11 @@ Page({
     onX,
     pressed
   ) {
+    const centerY = y + h / 2;
+    const knobPressedSize = Math.max(20, knobSize - 4);
+    const normalY = centerY - knobSize / 2;
+    const pressedY = centerY - knobPressedSize / 2;
+
     animate(
       track,
       pressed
@@ -1028,20 +1033,18 @@ Page({
           }
     );
 
-    const knobPressedSize = Math.max(20, knobSize - 4);
-
     animate(
       knob,
       pressed
         ? {
-            y: [knobY, knobY + 2],
+            y: [normalY, pressedY],
             w: [knobSize, knobPressedSize],
             h: [knobSize, knobPressedSize],
             duration: 100,
             easing: "easeout"
           }
         : {
-            y: [knobY + 2, knobY],
+            y: [pressedY, normalY],
             w: [knobPressedSize, knobSize],
             h: [knobPressedSize, knobSize],
             duration: 150,
@@ -1077,14 +1080,14 @@ Page({
     }
 
     const enabled = this.state.alarm.enabled;
-    const x = 240;
+    const x = 270;
     const y = 270;
-    const w = 130;
+    const w = 100;
     const h = 44;
     const knobSize = 30;
-    const knobY = 277;
-    const offX = 247;
-    const onX = 333;
+    const knobY = y + Math.floor((h - knobSize) / 2);
+    const offX = x + 7;
+    const onX = x + w - knobSize - 7;
     const targetX = enabled ? onX : offX;
     const currentX = enabled ? offX : onX;
 
@@ -1126,8 +1129,8 @@ Page({
       return;
     }
 
-    const trackX = 240;
-    const trackW = 130;
+    const trackX = 270;
+    const trackW = 100;
     const knobSize = 28;
     const offX = trackX + 6;
     const onX = trackX + trackW - knobSize - 6;
@@ -1151,7 +1154,9 @@ Page({
       prop.MORE,
       {
         x: animated ? currentX : targetX,
-        y: Number(key === "sound" ? 328 : 378),
+        y:
+          Number(key === "sound" ? 322 : 372) +
+          Math.floor((40 - knobSize) / 2),
         w: knobSize,
         h: knobSize,
         color: enabled ? 0x081018 : 0x6D7885,

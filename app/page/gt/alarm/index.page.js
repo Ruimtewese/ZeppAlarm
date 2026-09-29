@@ -7,9 +7,11 @@ import {
   loadObject,
   exitApp,
 
-  startTimerVibration,
-  stopVibration,
-
+  vibrateStrong,
+  createSystemSounds,
+  getSystemSoundTypes,
+  playSystemSound,
+  stopSystemSound,
   createAudioPlayer,
   setAudioSource,
   setAudioVolume,
@@ -102,7 +104,13 @@ Page({
     player:
       null,
 
-    vibrator:
+    vibrationTimer:
+      null,
+
+    audioRestartTimer:
+      null,
+
+    systemSounds:
       null
   },
 
@@ -249,7 +257,9 @@ Page({
         ),
       color:
         COLORS.text,
-      size: 58
+      size: 58,
+      font:
+        "fonts/time.ttf"
     });
   },
 
@@ -308,104 +318,245 @@ Page({
   },
 
   startAlarmVibration() {
-    try {
-      this.state.vibrator =
-        startTimerVibration();
-    } catch (error) {
-      this.state.vibrator =
-        null;
+    this.stopAlarmVibration();
 
-      console.log(
-        "Alarm vibration failed: " +
-        error
-      );
-    }
-  },
+    const pulse = () => {
+      if (
+        !this.state.alarm.vibration
+      ) {
+        return;
+      }
 
-  stopAlarmVibration() {
-    if (
-      this.state.vibrator
-    ) {
       try {
-        stopVibration(
-          this.state.vibrator
-        );
+        vibrateStrong();
       } catch (error) {
         console.log(
-          "Alarm vibration stop failed: " +
+          "Alarm vibration pulse failed: " +
           error
         );
       }
 
-      this.state.vibrator =
+      this.state.vibrationTimer =
+        setTimeout(
+          () => {
+            if (
+              !this.state.alarm.vibration
+            ) {
+              return;
+            }
+
+            try {
+              vibrateStrong();
+            } catch (error) {
+              console.log(
+                "Alarm vibration pulse failed: " +
+                error
+              );
+            }
+
+            this.state.vibrationTimer =
+              setTimeout(
+                () => {
+                  if (
+                    !this.state.alarm.vibration
+                  ) {
+                    return;
+                  }
+
+                  try {
+                    vibrateStrong();
+                  } catch (error) {
+                    console.log(
+                      "Alarm vibration pulse failed: " +
+                      error
+                    );
+                  }
+
+                  this.state.vibrationTimer =
+                    setTimeout(
+                      () => {
+                        if (
+                          !this.state.alarm.vibration
+                        ) {
+                          return;
+                        }
+
+                        try {
+                          vibrateStrong();
+                        } catch (error) {
+                          console.log(
+                            "Alarm vibration pulse failed: " +
+                            error
+                          );
+                        }
+
+                        this.state.vibrationTimer =
+                          setTimeout(
+                            pulse,
+                            1100
+                          );
+                      },
+                      240
+                    );
+                },
+                220
+              );
+          },
+          170
+        );
+    };
+
+    pulse();
+  },
+
+  stopAlarmVibration() {
+    if (
+      this.state.vibrationTimer
+    ) {
+      clearTimeout(
+        this.state.vibrationTimer
+      );
+
+      this.state.vibrationTimer =
         null;
     }
   },
 
   startAlarmSound() {
-    const player =
-      createAudioPlayer();
+    this.stopAlarmSound();
 
-    this.state.player =
-      player;
-
-    setAudioSource(
-      player,
-      SOUND_FILE
-    );
-
-    player.addEventListener(
-      player.event.COMPLETE,
-      () => {
-        if (
-          this.state.player !==
-          player
-        ) {
-          return;
-        }
-
-        prepareAudio(
-          player,
-          (ready) => {
-            if (
-              ready &&
-              this.state.player ===
-                player
-            ) {
-              setAudioVolume(
-                player,
-                100
-              );
-
-              player.start();
-            }
-          }
-        );
+    const startCustomSound = () => {
+      if (!this.state.alarm.sound) {
+        return;
       }
-    );
 
-    prepareAudio(
-      player,
-      (ready) => {
-        if (
-          !ready ||
-          this.state.player !==
+      const player =
+        createAudioPlayer();
+
+      this.state.player =
+        player;
+
+      setAudioSource(
+        player,
+        SOUND_FILE
+      );
+
+      player.addEventListener(
+        player.event.COMPLETE,
+        () => {
+          if (
+            this.state.player !==
             player
-        ) {
-          return;
-        }
+          ) {
+            return;
+          }
 
-        setAudioVolume(
-          player,
-          100
+          this.state.audioRestartTimer =
+            setTimeout(
+              () => {
+                if (
+                  this.state.player !==
+                    player ||
+                  !this.state.alarm.sound
+                ) {
+                  return;
+                }
+
+                prepareAudio(
+                  player,
+                  (ready) => {
+                    if (
+                      ready &&
+                      this.state.player ===
+                        player &&
+                      this.state.alarm.sound
+                    ) {
+                      setAudioVolume(
+                        player,
+                        100
+                      );
+
+                      player.start();
+                    }
+                  }
+                );
+              },
+              260
+            );
+        }
+      );
+
+      prepareAudio(
+        player,
+        (ready) => {
+          if (
+            !ready ||
+            this.state.player !==
+              player
+          ) {
+            return;
+          }
+
+          setAudioVolume(
+            player,
+            100
+          );
+
+          player.start();
+        }
+      );
+    };
+
+    try {
+      const systemSounds =
+        createSystemSounds();
+
+      this.state.systemSounds =
+        systemSounds;
+
+      const types =
+        getSystemSoundTypes(
+          systemSounds
         );
 
-        player.start();
+      const played =
+        playSystemSound(
+          types.ALARM,
+          0,
+          systemSounds
+        );
+
+      if (played) {
+        this.state.audioRestartTimer =
+          setTimeout(
+            startCustomSound,
+            520
+          );
+
+        return;
       }
-    );
+    } catch (error) {
+      console.log(
+        "System alarm sound unavailable: " +
+        error
+      );
+    }
+
+    startCustomSound();
   },
 
   stopAlarmSound() {
+    if (
+      this.state.audioRestartTimer
+    ) {
+      clearTimeout(
+        this.state.audioRestartTimer
+      );
+
+      this.state.audioRestartTimer =
+        null;
+    }
+
     const player =
       this.state.player;
 
@@ -416,6 +567,24 @@ Page({
       stopAudio(
         player
       );
+    }
+
+    if (
+      this.state.systemSounds
+    ) {
+      try {
+        stopSystemSound(
+          this.state.systemSounds
+        );
+      } catch (error) {
+        console.log(
+          "System alarm sound stop failed: " +
+          error
+        );
+      }
+
+      this.state.systemSounds =
+        null;
     }
   },
 

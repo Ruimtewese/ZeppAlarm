@@ -94,7 +94,9 @@ Page({
   state: {
     alarm: {
       hour: 7,
-      minute: 0
+      minute: 0,
+      sound: true,
+      vibration: true
     },
 
     player:
@@ -131,7 +133,17 @@ Page({
               0,
             0,
             59
-          )
+          ),
+
+        sound:
+          saved.sound === undefined
+            ? true
+            : Boolean(saved.sound),
+
+        vibration:
+          saved.vibration === undefined
+            ? true
+            : Boolean(saved.vibration)
       };
     }
   },
@@ -179,8 +191,13 @@ Page({
     this.buildSnooze();
     this.buildCancel();
 
-    this.startAlarmSound();
-    this.startAlarmVibration();
+    if (this.state.alarm.sound) {
+      this.startAlarmSound();
+    }
+
+    if (this.state.alarm.vibration) {
+      this.startAlarmVibration();
+    }
   },
 
   buildBackground() {

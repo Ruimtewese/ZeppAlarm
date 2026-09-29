@@ -3,6 +3,8 @@ import {
   configureTheme,
   text,
   pillAligned,
+  horizontalAlign,
+  verticalAlign,
   card,
   circle,
   timePicker,
@@ -599,8 +601,8 @@ Page({
         value: "",
         color: COLORS.muted,
         size: 12,
-        alignH: 1,
-        alignV: 2,
+        alignH: horizontalAlign("center"),
+        alignV: verticalAlign("bottom"),
         alpha: 0
       });
 
@@ -671,8 +673,8 @@ Page({
         value: "TURN ON TO SCHEDULE",
         color: 0x43505E,
         size: 13,
-        alignH: 0,
-        alignV: 2
+        alignH: horizontalAlign("left"),
+        alignV: verticalAlign("bottom")
       });
 
     this.state.widgets.timeHint =
@@ -684,8 +686,8 @@ Page({
         value: "TAP TO EDIT",
         color: 0x43505E,
         size: 12,
-        alignH: 2,
-        alignV: 2
+        alignH: horizontalAlign("right"),
+        alignV: verticalAlign("bottom")
       });
 
     this.state.widgets.timeText.addEventListener(
@@ -720,8 +722,8 @@ Page({
         value: "REPEAT",
         color: COLORS.muted,
         size: 14,
-        alignH: 0,
-        alignV: 2
+        alignH: horizontalAlign("left"),
+        alignV: verticalAlign("bottom")
       });
 
     this.state.widgets.repeatSummary =
@@ -733,8 +735,8 @@ Page({
         value: "Every day",
         color: COLORS.muted,
         size: 14,
-        alignH: 2,
-        alignV: 2
+        alignH: horizontalAlign("right"),
+        alignV: verticalAlign("bottom")
       });
 
     const size = 44;
@@ -934,7 +936,7 @@ Page({
     );
   },
 
-  animateAlarmState() {
+  animateAlarmState(animated = true) {
     const track = this.state.widgets.alarmSwitchTrack;
     const knob = this.state.widgets.alarmSwitchKnob;
 
@@ -960,10 +962,13 @@ Page({
       }
     );
 
+    const targetX = enabled ? onX : offX;
+    const currentX = enabled ? offX : onX;
+
     knob.setProperty(
       prop.MORE,
       {
-        x: enabled ? onX : offX,
+        x: animated ? currentX : targetX,
         y: 316,
         w: 48,
         h: 48,
@@ -974,18 +979,16 @@ Page({
       }
     );
 
-    animate(
-      knob,
-      {
-        x: [enabled ? offX : onX, enabled ? onX : offX],
-        duration: 360,
-        easing: "easeout"
-      }
-    );
-  },
-
-  animateOpenSwitch() {
-    this.animateAlarmState();
+    if (animated) {
+      animate(
+        knob,
+        {
+          x: [currentX, targetX],
+          duration: 360,
+          easing: "easeout"
+        }
+      );
+    }
   },
 
   showStatus(message) {
@@ -1008,12 +1011,6 @@ Page({
     }
 
     this.state.statusTimer = setTimeout(() => {
-      fadeIn(
-        status,
-        {
-          duration: 240
-        }
-      );
       animate(
         status,
         {
@@ -1352,7 +1349,7 @@ Page({
 
     this.refreshMeta();
     this.refreshDays();
-    this.animateAlarmState();
+    this.animateAlarmState(false);
 
     if (this.state.widgets.timeCard) {
       this.state.widgets.timeCard.setProperty(

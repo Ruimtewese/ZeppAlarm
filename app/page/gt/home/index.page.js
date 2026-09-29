@@ -4,6 +4,8 @@ import {
   text,
   pillAligned,
   card,
+  circle,
+  divider,
   switchControl,
   timePicker,
   loadObject,
@@ -17,7 +19,7 @@ import {
 import {
   prop,
   event
-} from "@zos/ui";
+} from "zeppcore";
 
 import {
   COLORS
@@ -461,7 +463,12 @@ Page({
 
     widgets: {
       days: [],
+      timeCard: null,
+      timeDot: null,
       timeLabel: null,
+      timeText: null,
+      timeHint: null,
+      timeAccent: null,
       repeatLabel: null
     },
   },
@@ -504,64 +511,89 @@ Page({
   },
 
   buildTime() {
-    card({
-      x: 16,
-      y: 16,
-      w: 358,
-      h: 208,
-      color:
-        COLORS.surface,
-      radius: 42
-    });
+    this.state.widgets.timeCard =
+      card({
+        x: 16,
+        y: 16,
+        w: 358,
+        h: 208,
+        color:
+          COLORS.surface,
+        radius: 42
+      });
+
+    this.state.widgets.timeDot =
+      circle({
+        centerX: 48,
+        centerY: 53,
+        radius: 7,
+        color:
+          COLORS.blue,
+        alpha: 255
+      });
 
     this.state.widgets.timeLabel =
       text({
-        x: 34,
-        y: 36,
-        w: 322,
+        x: 66,
+        y: 39,
+        w: 285,
         h: 24,
         value:
-          "ALARM TIME",
+          "NEXT ALARM",
         color:
           COLORS.muted,
         size: 14
       });
 
-    this.state.widgets.time =
-      pillAligned({
+    this.state.widgets.timeText =
+      text({
         x: 28,
-        y: 66,
+        y: 77,
         w: 334,
-        h: 118,
-
-        text:
+        h: 82,
+        value:
           "7:00 AM",
-
-        horizontal:
-          "center",
-
-        vertical:
-          "center",
-
-        textColor:
+        color:
           COLORS.blue,
-
-        textSize:
-          64,
-
-        normalColor:
-          COLORS.surface,
-        
-        pressColor:
-          COLORS.surface2,
-
-        radius:
-          34,
-
-        onClick: () => {
-          this.openTimePicker();
-        }
+        size: 70
       });
+
+    this.state.widgets.timeHint =
+      text({
+        x: 28,
+        y: 164,
+        w: 334,
+        h: 25,
+        value:
+          "TAP TO CHANGE TIME",
+        color:
+          COLORS.muted,
+        size: 13
+      });
+
+    this.state.widgets.timeAccent =
+      divider({
+        x: 28,
+        y: 197,
+        w: 78,
+        h: 4,
+        color:
+          COLORS.blue
+      });
+
+    this.state.widgets.timeText.addEventListener(
+      event.CLICK_UP,
+      () => {
+        this.openTimePicker();
+      }
+    );
+
+    this.state.widgets.timeHint.addEventListener(
+      event.CLICK_UP,
+      () => {
+        this.openTimePicker();
+      }
+    );
   },
 
   buildDays() {
@@ -774,57 +806,163 @@ Page({
   },
 
   animateOpen() {
-    const time =
-      this.state.widgets.time;
+    const cardWidget =
+      this.state.widgets.timeCard;
 
-    if (time) {
-      popIn(
-        time.button,
-        28,
-        66,
-        334,
-        118,
+    if (cardWidget) {
+      cardWidget.setProperty(
+        prop.MORE,
         {
-          scale: 0.82,
-          duration: 520,
-          easing: "easeout"
+          x: 26,
+          y: 24,
+          w: 338,
+          h: 196,
+          alpha: 0
         }
       );
 
       popIn(
-        time.text,
-        28,
-        66,
-        334,
-        118,
+        cardWidget,
+        16,
+        16,
+        358,
+        208,
         {
-          scale: 0.82,
+          scale: 0.91,
           duration: 520,
           easing: "easeout"
         }
       );
     }
 
-    if (
-      this.state.widgets.timeLabel
-    ) {
-      fadeIn(
-        this.state.widgets.timeLabel,
+    const dot =
+      this.state.widgets.timeDot;
+
+    if (dot) {
+      dot.setProperty(
+        prop.MORE,
         {
-          duration: 300,
-          offset: 120
+          center_x: 48,
+          center_y: 53,
+          radius: 7,
+          color: COLORS.blue,
+          alpha: 0
+        }
+      );
+
+      fadeIn(
+        dot,
+        {
+          duration: 260,
+          offset: 180
         }
       );
     }
 
-    if (
-      this.state.widgets.repeatLabel
-    ) {
-      fadeIn(
-        this.state.widgets.repeatLabel,
+    const label =
+      this.state.widgets.timeLabel;
+
+    if (label) {
+      label.setProperty(
+        prop.MORE,
         {
+          x: 78,
+          y: 39,
+          w: 273,
+          h: 24,
+          alpha: 0
+        }
+      );
+
+      animate(
+        label,
+        {
+          x: [78, 66],
+          alpha: [0, 255],
           duration: 300,
-          offset: 260
+          easing: "easeout",
+          offset: 220
+        }
+      );
+    }
+
+    const timeText =
+      this.state.widgets.timeText;
+
+    if (timeText) {
+      timeText.setProperty(
+        prop.MORE,
+        {
+          x: 28,
+          y: 96,
+          w: 334,
+          h: 82,
+          alpha: 0
+        }
+      );
+
+      animate(
+        timeText,
+        {
+          y: [96, 77],
+          alpha: [0, 255],
+          duration: 520,
+          easing: "easeout",
+          offset: 340
+        }
+      );
+    }
+
+    const hint =
+      this.state.widgets.timeHint;
+
+    if (hint) {
+      hint.setProperty(
+        prop.MORE,
+        {
+          x: 28,
+          y: 178,
+          w: 334,
+          h: 25,
+          alpha: 0
+        }
+      );
+
+      animate(
+        hint,
+        {
+          y: [178, 164],
+          alpha: [0, 255],
+          duration: 320,
+          easing: "easeout",
+          offset: 560
+        }
+      );
+    }
+
+    const accent =
+      this.state.widgets.timeAccent;
+
+    if (accent) {
+      accent.setProperty(
+        prop.MORE,
+        {
+          x: 28,
+          y: 197,
+          w: 0,
+          h: 4,
+          color: COLORS.blue,
+          alpha: 255
+        }
+      );
+
+      animate(
+        accent,
+        {
+          w: [0, 78],
+          duration: 420,
+          easing: "easeout",
+          offset: 680
         }
       );
     }
@@ -842,13 +980,12 @@ Page({
             duration: 380,
             easing: "easeout",
             offset:
-              360 +
+              760 +
               index * 120
           }
         );
       }
     );
-
   },
 
   openTimePicker() {
@@ -957,13 +1094,17 @@ Page({
       this.state.alarm;
 
     if (
-      this.state.widgets.time
+      this.state.widgets.timeText
     ) {
-      this.state.widgets.time.setText(
-        formatAlarmTime(
-          alarm.hour,
-          alarm.minute
-        )
+      this.state.widgets.timeText.setProperty(
+        prop.MORE,
+        {
+          text:
+            formatAlarmTime(
+              alarm.hour,
+              alarm.minute
+            )
+        }
       );
     }
 

@@ -596,7 +596,7 @@ Page({
     this.state.widgets.timeCard =
       card({
         x: 20,
-        y: 16,
+        y: 10,
         w: 350,
         h: 140,
         color: COLORS.surface,
@@ -606,7 +606,7 @@ Page({
     this.state.widgets.timeText =
       text({
         x: 28,
-        y: 56,
+        y: 50,
         w: 334,
         h: 60,
         value: "7:00 AM",
@@ -1087,9 +1087,9 @@ Page({
         prop.MORE,
         {
           x: 27,
-          y: 44,
+          y: 18,
           w: 336,
-          h: 142,
+          h: 132,
           alpha: 0
         }
       );

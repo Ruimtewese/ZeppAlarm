@@ -7,11 +7,9 @@ import {
   verticalAlign,
   card,
   timePicker,
+  animate,
   loadObject,
   saveObject,
-  animate,
-  animateGroup,
-  popIn
 } from "zeppcore";
 
 import {
@@ -961,76 +959,9 @@ Page({
     );
   },
 
-  animateSmallSwitchPress(
-    track,
-    knob,
-    x,
-    y,
-    w,
-    h,
-    knobSize,
-    knobY,
-    offX,
-    onX,
-    pressed
-  ) {
-    const centerY =
-      y + h / 2;
-
-    const pressedSize =
-      Math.max(
-        20,
-        knobSize - 4
-      );
-
-    const normalY =
-      centerY -
-      knobSize / 2;
-
-    const pressedY =
-      centerY -
-      pressedSize / 2;
-
-    animate(
-      track,
-      pressed
-        ? {
-            x: [x, x + 3],
-            y: [y, y + 2],
-            w: [w, w - 6],
-            h: [h, h - 4],
-            duration: 90,
-            easing: "easeout"
-          }
-        : {
-            x: [x + 3, x],
-            y: [y + 2, y],
-            w: [w - 6, w],
-            h: [h - 4, h],
-            duration: 140,
-            easing: "easeout"
-          }
-    );
-
-    animate(
-      knob,
-      pressed
-        ? {
-            y: [normalY, pressedY],
-            w: [knobSize, pressedSize],
-            h: [knobSize, pressedSize],
-            duration: 90,
-            easing: "easeout"
-          }
-        : {
-            y: [pressedY, normalY],
-            w: [pressedSize, knobSize],
-            h: [pressedSize, knobSize],
-            duration: 140,
-            easing: "easeout"
-          }
-    );
-  },
+  animateSmallSwitchPress() {
+    return;
+  }
 
   toggleAlarm() {
     const alarm =
@@ -1068,9 +999,7 @@ Page({
     );
   },
 
-  animateAlarmState(
-    animated = true
-  ) {
+  animateAlarmState() {
     const track =
       this.state.widgets.alarmSwitchTrack;
 
@@ -1089,40 +1018,18 @@ Page({
     const w = 84;
     const h = 34;
     const knobSize = 26;
-
     const knobY =
       y +
-      Math.floor(
-        (h - knobSize) / 2
-      );
-
-    const offX =
-      x + 6;
-
+      Math.floor((h - knobSize) / 2);
+    const offX = x + 6;
     const onX =
-      x +
-      w -
-      knobSize -
-      6;
-
-    const targetX =
-      enabled
-        ? onX
-        : offX;
-
-    const currentX =
-      enabled
-        ? offX
-        : onX;
+      x + w - knobSize - 6;
+    const targetX = enabled ? onX : offX;
 
     track.setProperty(
       prop.MORE,
       {
-        color:
-          enabled
-            ? COLORS.mint
-            : COLORS.surface2,
-
+        color: enabled ? COLORS.mint : COLORS.surface2,
         x,
         y,
         w,
@@ -1134,110 +1041,45 @@ Page({
     knob.setProperty(
       prop.MORE,
       {
-        x:
-          animated
-            ? currentX
-            : targetX,
-
+        x: targetX,
         y: knobY,
         w: knobSize,
         h: knobSize,
-
-        color:
-          enabled
-            ? 0x10241D
-            : 0x5B6670,
-
+        color: enabled ? 0x10241D : 0x5B6670,
         radius: 14
       }
     );
+  }
 
-    if (animated) {
-      animate(
-        knob,
-        {
-          x: [
-            currentX,
-            targetX
-          ],
-          duration: 300,
-          easing: "easeout"
-        }
-      );
-    }
-  },
-
-  refreshOptionSwitch(
-    key,
-    animated = true
-  ) {
+  refreshOptionSwitch(key) {
     const enabled =
-      Boolean(
-        this.state.alarm[key]
-      );
+      Boolean(this.state.alarm[key]);
 
     const track =
-      this.state.widgets[
-        key +
-        "SwitchTrack"
-      ];
+      this.state.widgets[key + "SwitchTrack"];
 
     const knob =
-      this.state.widgets[
-        key +
-        "SwitchKnob"
-      ];
+      this.state.widgets[key + "SwitchKnob"];
 
     if (!track || !knob) {
       return;
     }
 
     const x = 276;
-    const rowY =
-      key === "sound"
-        ? 302
-        : 362;
-
-    const y =
-      rowY + 8;
-
+    const rowY = key === "sound" ? 302 : 362;
+    const y = rowY + 8;
     const w = 84;
     const h = 34;
     const knobSize = 26;
-
-    const offX =
-      x + 6;
-
-    const onX =
-      x +
-      w -
-      knobSize -
-      6;
-
-    const knobY =
-      y +
-      Math.floor(
-        (h - knobSize) / 2
-      );
-
-    const targetX =
-      enabled
-        ? onX
-        : offX;
-
-    const currentX =
-      enabled
-        ? offX
-        : onX;
+    const offX = x + 6;
+    const onX = x + w - knobSize - 6;
+    const knobY = y + Math.floor((h - knobSize) / 2);
+    const targetX = enabled ? onX : offX;
 
     track.setProperty(
       prop.MORE,
       {
-        color:
-          enabled
-            ? COLORS.mint
-            : COLORS.surface2,
-
+        color: enabled ? COLORS.mint : COLORS.surface2,
         x,
         y,
         w,
@@ -1249,58 +1091,17 @@ Page({
     knob.setProperty(
       prop.MORE,
       {
-        x:
-          animated
-            ? currentX
-            : targetX,
-
+        x: targetX,
         y: knobY,
         w: knobSize,
         h: knobSize,
-
-        color:
-          enabled
-            ? 0x10241D
-            : 0x5B6670,
-
+        color: enabled ? 0x10241D : 0x5B6670,
         radius: 14
       }
     );
-
-    if (animated) {
-      animate(
-        knob,
-        {
-          x: [
-            currentX,
-            targetX
-          ],
-          duration: 260,
-          easing: "easeout"
-        }
-      );
-    }
-  },
+  }
 
   animateOpen() {
-    const cardWidget =
-      this.state.widgets.timeCard;
-
-    if (cardWidget) {
-      popIn(
-        cardWidget,
-        18,
-        24,
-        354,
-        138,
-        {
-          scale: 0.95,
-          duration: 360,
-          easing: "easeout"
-        }
-      );
-    }
-
     this.state.widgets.days.forEach(
       (dayWidget, index) => {
         if (!dayWidget) {
@@ -1350,178 +1151,7 @@ Page({
         );
       }
     );
-
-    const rows = [
-      this.state.widgets.alarmRow,
-      this.state.widgets.soundRow,
-      this.state.widgets.vibrationRow
-    ];
-
-    rows.forEach(
-      (row, index) => {
-        if (!row) {
-          return;
-        }
-
-        row.setProperty(
-          prop.MORE,
-          {
-            x: 26,
-            alpha: 0
-          }
-        );
-
-        animate(
-          row,
-          {
-            x: [26, 18],
-            alpha: [0, 255],
-            duration: 280,
-            easing: "easeout",
-            offset:
-              420 +
-              index * 70
-          }
-        );
-      }
-    );
-
-    this.state.widgets.controlLabels.forEach(
-      (labelWidget) => {
-        labelWidget.setProperty(
-          prop.MORE,
-          {
-            x: 42,
-            alpha: 0
-          }
-        );
-
-        animate(
-          labelWidget,
-          {
-            x: [42, 34],
-            alpha: [0, 255],
-            duration: 280,
-            easing: "easeout",
-            offset: 420
-          }
-        );
-      }
-    );
-
-    const switches = [
-      {
-        track:
-          this.state.widgets.alarmSwitchTrack,
-
-        knob:
-          this.state.widgets.alarmSwitchKnob,
-
-        x: 276,
-        y: 247
-      },
-      {
-        track:
-          this.state.widgets.soundSwitchTrack,
-
-        knob:
-          this.state.widgets.soundSwitchKnob,
-
-        x: 276,
-        y: 310
-      },
-      {
-        track:
-          this.state.widgets.vibrationSwitchTrack,
-
-        knob:
-          this.state.widgets.vibrationSwitchKnob,
-
-        x: 276,
-        y: 370
-      }
-    ];
-
-    switches.forEach(
-      (item) => {
-        if (
-          !item.track ||
-          !item.knob
-        ) {
-          return;
-        }
-
-        const knobSize = 26;
-        const h = 34;
-        const knobY =
-          item.y +
-          Math.floor(
-            (h - knobSize) / 2
-          );
-
-        const offX =
-          item.x + 6;
-
-        const onX =
-          item.x +
-          84 -
-          knobSize -
-          6;
-
-        const enabled =
-          item.track ===
-            this.state.widgets.alarmSwitchTrack
-            ? this.state.alarm.enabled
-            : item.track ===
-                this.state.widgets.soundSwitchTrack
-              ? this.state.alarm.sound
-              : this.state.alarm.vibration;
-
-        const targetX =
-          enabled
-            ? onX
-            : offX;
-
-        item.track.setProperty(
-          prop.MORE,
-          {
-            x: item.x,
-            y: item.y,
-            alpha: 0
-          }
-        );
-
-        item.knob.setProperty(
-          prop.MORE,
-          {
-            x: targetX,
-            y: knobY,
-            alpha: 0
-          }
-        );
-
-        animate(
-          item.track,
-          {
-            alpha: [0, 255],
-            duration: 280,
-            easing: "easeout",
-            offset: 420
-          }
-        );
-
-        animate(
-          item.knob,
-          {
-            alpha: [0, 255],
-            duration: 280,
-            easing: "easeout",
-            offset: 420
-          }
-        );
-      }
-    );
-  },
+  }
 
   openTimePicker() {
     const alarm =

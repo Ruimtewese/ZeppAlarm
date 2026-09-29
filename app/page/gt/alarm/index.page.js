@@ -7,6 +7,9 @@ import {
   loadObject,
   exitApp,
 
+  startTimerVibration,
+  stopVibration,
+
   createAudioPlayer,
   setAudioSource,
   setAudioVolume,
@@ -19,10 +22,6 @@ import {
   REPEAT_ONCE
 } from "@zos/alarm";
 
-import {
-  Vibrator,
-  VIBRATOR_SCENE_TIMER
-} from "@zos/sensor";
 
 import {
   COLORS
@@ -292,21 +291,13 @@ Page({
   },
 
   startAlarmVibration() {
-    const vibrator =
-      this.state.vibrator;
-
-    if (!vibrator) {
-      return;
-    }
-
     try {
-      vibrator.stop();
-      vibrator.setMode({
-        mode:
-          VIBRATOR_SCENE_TIMER
-      });
-      vibrator.start();
+      this.state.vibrator =
+        startTimerVibration();
     } catch (error) {
+      this.state.vibrator =
+        null;
+
       console.log(
         "Alarm vibration failed: " +
         error
@@ -315,20 +306,22 @@ Page({
   },
 
   stopAlarmVibration() {
-    const vibrator =
-      this.state.vibrator;
+    if (
+      this.state.vibrator
+    ) {
+      try {
+        stopVibration(
+          this.state.vibrator
+        );
+      } catch (error) {
+        console.log(
+          "Alarm vibration stop failed: " +
+          error
+        );
+      }
 
-    if (!vibrator) {
-      return;
-    }
-
-    try {
-      vibrator.stop();
-    } catch (error) {
-      console.log(
-        "Alarm vibration stop failed: " +
-        error
-      );
+      this.state.vibrator =
+        null;
     }
   },
 

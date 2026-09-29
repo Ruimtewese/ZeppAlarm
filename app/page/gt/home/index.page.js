@@ -93,7 +93,7 @@ const DEFAULT_ALARM = {
 
 configureTheme({
   background:
-    COLORS.background,
+    0x000000,
 
   surface:
     COLORS.surface,
@@ -493,7 +493,7 @@ Page({
       w: 390,
       h: 450,
       color:
-        COLORS.background,
+        0x000000,
       radius: 0
     });
   },

@@ -585,7 +585,7 @@ Page({
     this.state.widgets.statusText =
       text({
         x: 30,
-        y: 428,
+        y: 438,
         w: 330,
         h: 16,
         value: "",
@@ -615,7 +615,7 @@ Page({
     this.state.widgets.timeCard =
       card({
         x: 18,
-        y: 14,
+        y: 24,
         w: 354,
         h: 138,
         color:
@@ -643,7 +643,7 @@ Page({
     this.state.widgets.timeText =
       text({
         x: 28,
-        y: 55,
+        y: 65,
         w: 334,
         h: 66,
         value: formatAlarmTime(
@@ -671,7 +671,7 @@ Page({
     this.state.widgets.repeatLabel =
       text({
         x: 20,
-        y: 174,
+        y: 184,
         w: 90,
         h: 22,
         value: "REPEAT",
@@ -684,7 +684,7 @@ Page({
     this.state.widgets.repeatSummary =
       text({
         x: 105,
-        y: 174,
+        y: 184,
         w: 265,
         h: 22,
         value: getRepeatSummary(
@@ -699,7 +699,7 @@ Page({
     const size = 40;
     const gap = 7;
     const startX = 34;
-    const y = 202;
+    const y = 212;
 
     this.state.widgets.days = [];
 
@@ -791,8 +791,8 @@ Page({
   },
 
   buildMainSwitch() {
-    const x = 153;
-    const y = 255;
+    const x = 276;
+    const y = 265;
     const w = 84;
     const h = 34;
     const knob = 26;
@@ -815,7 +815,7 @@ Page({
     const row =
       card({
         x: 18,
-        y: 248,
+        y: 268,
         w: 354,
         h: 48,
         color: COLORS.surface,
@@ -828,7 +828,7 @@ Page({
     const labelWidget =
       text({
         x: 34,
-        y: 248,
+        y: 268,
         w: 90,
         h: 48,
         value: "ALARM",
@@ -921,7 +921,7 @@ Page({
         ? "sound"
         : "vibration";
 
-    const x = 153;
+    const x = 276;
     const trackY =
       rowY + 8;
     const w = 84;
@@ -1189,8 +1189,8 @@ Page({
     const enabled =
       this.state.alarm.enabled;
 
-    const x = 153;
-    const y = 255;
+    const x = 276;
+    const y = 265;
     const w = 84;
     const h = 34;
     const knobSize = 26;
@@ -1297,11 +1297,11 @@ Page({
       return;
     }
 
-    const x = 153;
+    const x = 276;
     const rowY =
       key === "sound"
-        ? 310
-        : 370;
+        ? 320
+        : 380;
 
     const y =
       rowY + 8;
@@ -1395,7 +1395,7 @@ Page({
       popIn(
         cardWidget,
         18,
-        14,
+        24,
         354,
         138,
         {
@@ -1472,8 +1472,8 @@ Page({
         knob:
           this.state.widgets.alarmSwitchKnob,
 
-        x: 153,
-        y: 255
+        x: 276,
+        y: 265
       },
       {
         track:
@@ -1482,8 +1482,8 @@ Page({
         knob:
           this.state.widgets.soundSwitchKnob,
 
-        x: 153,
-        y: 318
+        x: 276,
+        y: 328
       },
       {
         track:
@@ -1492,8 +1492,8 @@ Page({
         knob:
           this.state.widgets.vibrationSwitchKnob,
 
-        x: 153,
-        y: 378
+        x: 276,
+        y: 388
       }
     ];
 

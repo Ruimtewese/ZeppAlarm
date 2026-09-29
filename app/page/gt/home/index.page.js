@@ -598,7 +598,7 @@ Page({
         x: 20,
         y: 36,
         w: 350,
-        h: 100,
+        h: 150,
         color: COLORS.surface,
         radius: 26
       });
@@ -606,7 +606,7 @@ Page({
     this.state.widgets.timeText =
       text({
         x: 28,
-        y: 58,
+        y: 83,
         w: 334,
         h: 56,
         value: "7:00 AM",
@@ -1088,9 +1088,9 @@ Page({
         prop.MORE,
         {
           x: 27,
-          y: 40,
+          y: 44,
           w: 336,
-          h: 92,
+          h: 142,
           alpha: 0
         }
       );
@@ -1100,7 +1100,7 @@ Page({
         20,
         36,
         350,
-        100,
+        150,
         {
           scale: 0.92,
           duration: groupDuration,
@@ -1115,7 +1115,7 @@ Page({
       time.setProperty(
         prop.MORE,
         {
-          y: 75,
+          y: 100,
           alpha: 0
         }
       );
@@ -1123,7 +1123,7 @@ Page({
       animate(
         time,
         {
-          y: [75, 58],
+          y: [100, 83],
           alpha: [0, 255],
           duration: groupDuration,
           easing: "easeout",
